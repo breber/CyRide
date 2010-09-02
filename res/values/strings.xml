@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello">Hello World, StartCyRide!</string>
+    <string name="app_name">CyRide Mobile</string>
+<string name="DataURL">http://cyridesql.appspot.com/getroutes</string>
+<string name="welcome">Welcome to CyRide Mobile!</string>
+</resources>

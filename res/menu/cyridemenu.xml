@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+  xmlns:android="http://schemas.android.com/apk/res/android">
+<item android:title="Get Data" android:id="@+id/getDataMenu" android:checkable="false"></item>
+
+<item android:title="Count SQL Records" android:id="@+id/countSQL"></item>
+<item android:title="Open DB" android:id="@+id/openDB"></item>
+<item android:title="Close DB" android:id="@+id/closeDB"></item>
+<item android:title="Delete Records" android:id="@+id/deleteAll"></item>
+
+</menu>
