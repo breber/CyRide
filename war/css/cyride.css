@@ -1,0 +1,81 @@
+#table tr:hover {
+	background-color: #C0C0C0
+}
+
+tr {
+	background-color: White
+}
+
+.blue {
+	background-color: blue;
+	color: white
+}
+
+.red {
+	background-color: red;
+	color: white
+}
+
+.yellow {
+	background-color: yellow;
+	color: black
+}
+
+.green {
+	background-color: green;
+	color: white
+}
+
+.brown	{
+	background-color: brown;
+	color: white
+}
+
+a:link,a:visited,a:active {
+	text-decoration: none;
+	color: white
+}
+
+a:hover {
+	text-decoration: underline
+}
+
+h2 {
+	color: Black;
+	display:inline;
+}
+
+.loading {
+	float: right;
+	margin:0.25em 0px;
+}
+
+#top {margin-bottom:1em;}
+
+.hide {
+	display: none
+}
+
+#selector {
+	display: inline;
+	float:left;
+	padding:5px;
+	height:100%;
+	width:50em;
+}
+#all { width:100%; }
+
+#left {
+	max-width:295px; position:fixed; z-index:100;	
+}
+
+#right {
+	padding-left:295px;	z-index:1;
+}
+
+#changeStation {
+	display:none;
+	cursor:pointer	
+}
+
+label, select { display:inline }

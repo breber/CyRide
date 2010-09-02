@@ -1,0 +1,80 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Add Route</title>
+    <script type="text/javascript"
+		src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+    <script type="text/javascript">
+    	$().ready(function() {
+    		$("#routeid").val($("#routename").attr("selectedIndex"));
+    		$("#routename").change(function() {
+				$("#routeid").val(this.selectedIndex);
+    		});
+    	});
+    </script>
+  </head>
+
+  <body>
+    <h1>Add Route</h1>
+	
+<form id='form' name='form' method="POST" action="/createroute">
+<fieldset>
+	<input type="hidden" id="identifier" name="identifier" />
+	<label for="routename">Route Name</label>
+	<select id="routename" name="routename">
+	<option id="1_red_s-w">#1 Red South &amp; West</option>
+	<option id="1_red_e-n">#1 Red East &amp; North</option>
+	<option id="2_green_s-w">#2 Green South &amp; West</option>
+	<option id="2_green_e-n">#2 Green East &amp; North</option>
+	<option id="3_blue_s">#3 Blue South</option>
+	<option id="3_blue_n">#3 Blue North</option>
+	<option id="5_yellow">#5 Yellow</option>
+	<option id="6_brown">#6 Brown</option>
+	<option id="6A_towers">#6A Towers/Campus</option>
+	</select>
+	<input type="hidden" name="routeid" id="routeid" value="0"/>
+	<label for="station">Station</label>
+	<input type="text" name="station" id="station" size="50"/>
+	<label for="stationid">Station Id</label>
+	<input type="text" name="stationid" id="stationid" size="4"/>
+	<label for="day">Day</label>
+	<select id="day" name="day">
+	<option id="0" value="0">Weekday</option>
+	<option id="1" value="1">Saturday</option>
+	<option id="2" value="2">Sunday</option>
+	</select>
+	<label for="hour">Hour</label>
+	<select id="hour" name="hour">
+	<option id="0" value="0">12 AM</option>
+	<option id="1" value="1">1 AM</option>
+	<option id="2" value="2">2 AM</option>
+	<option id="3" value="3">3 AM</option>
+	<option id="4" value="4">4 AM</option>
+	<option id="5" value="5">5 AM</option>
+	<option id="6" value="6">6 AM</option>
+	<option id="7" value="7">7 AM</option>
+	<option id="8" value="8">8 AM</option>
+	<option id="9" value="9">9 AM</option>
+	<option id="10" value="10">10 AM</option>
+	<option id="11" value="11">11 AM</option>
+	<option id="12" value="12">12 PM</option>
+	<option id="13" value="13">1 PM</option>
+	<option id="14" value="14">2 PM</option>
+	<option id="15" value="15">3 PM</option>
+	<option id="16" value="16">4 PM</option>
+	<option id="17" value="17">5 PM</option>
+	<option id="18" value="18">6 PM</option>
+	<option id="19" value="19">7 PM</option>
+	<option id="20" value="20">8 PM</option>
+	<option id="21" value="21">9 PM</option>
+	<option id="22" value="22">10 PM</option>
+	<option id="23" value="23">11 PM</option>
+	</select>
+	<label for="minute">Minute</label>
+	<input type="text" name="minute" id="minute" size="2"/>
+	</fieldset>
+	<input type="submit"/>
+</form>
+  </body>
+</html>
