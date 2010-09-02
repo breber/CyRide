@@ -15,7 +15,7 @@ import android.util.Log;
  * @author brianreber
  *
  */
-public class DBAdapter 
+public class CyRideDB 
 {
 	public static final String KEY_ROWID = "_id";
 	public static final String KEY_ROUTEID = "routeid";
@@ -43,7 +43,7 @@ public class DBAdapter
 
 	private DatabaseHelper DBHelper;
 
-	public DBAdapter(Context ctx) 
+	public CyRideDB(Context ctx) 
 	{
 		this.context = ctx;
 		open();

@@ -33,10 +33,9 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class StartCyRide extends Activity {
+public class CyRideActivity extends Activity {
 	private JSONObject json;
-	private DBAdapter db;
-	private TextView tv;
+	private CyRideDB db;
 	private ListView lv;
 	private Adapter adapter;
 	
@@ -49,7 +48,7 @@ public class StartCyRide extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		db = new DBAdapter(this);
+		db = new CyRideDB(this);
 
 		Calendar c = Calendar.getInstance();
 		int tempDOW = c.get(Calendar.DAY_OF_WEEK);
@@ -61,7 +60,6 @@ public class StartCyRide extends Activity {
 			db.setDayOfWeek(0);
 		}
 
-		tv = (TextView) findViewById(R.id.text);
 		lv = (ListView) findViewById(R.id.ListView);
 		
 		lv.setOnItemClickListener(new OnItemClickListener() {
@@ -184,7 +182,7 @@ public class StartCyRide extends Activity {
 			getDataProcess(true);
 		}
 		if (menuTitle.equals("Count SQL Records")) {
-			Dialog d = new Dialog(StartCyRide.this);
+			Dialog d = new Dialog(CyRideActivity.this);
 			d.setCancelable(true);
 			d.setTitle(getCount()+"");
 			d.show();
@@ -197,7 +195,7 @@ public class StartCyRide extends Activity {
 		}
 		if (menuTitle.equals("Delete Records")) {
 			db.deleteAllRoutes();
-			Dialog d = new Dialog(StartCyRide.this);
+			Dialog d = new Dialog(CyRideActivity.this);
 			d.setCancelable(true);
 			d.setTitle("DB Cleared");
 			d.show();
@@ -229,8 +227,6 @@ public class StartCyRide extends Activity {
 		prompt.setTitle("Loading...");
 
 		final Handler handler = new Handler();
-		TextView l = (TextView) findViewById(R.id.text);
-		l.setText("Starting to get Data");
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -240,7 +236,6 @@ public class StartCyRide extends Activity {
 					handler.post(new Runnable() {
 						@Override
 						public void run() {
-							tv.setText("Got Data");
 							prompt.dismiss();
 							
 							try {
