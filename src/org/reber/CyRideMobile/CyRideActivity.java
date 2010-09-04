@@ -38,6 +38,7 @@ public class CyRideActivity extends Activity {
 	private JSONObject json;
 	private CyRideDB db;
 	private ListView lv;
+	private TextView tv;
 	private Adapter adapter;
 	
 	private List<String> list;
@@ -68,6 +69,8 @@ public class CyRideActivity extends Activity {
 		selectedStation = new NameIdWrapper("", -1);
 		list = new ArrayList<String>();
 		listIds = new ArrayList<NameIdWrapper>();
+		
+		tv = (TextView) findViewById(R.id.text);
 		
 		lv = (ListView) findViewById(R.id.ListView);
 		
@@ -113,7 +116,7 @@ public class CyRideActivity extends Activity {
 		} else if (status == ListViewStatus.STATIONS) {
 			status = ListViewStatus.TIMES_FOR_STATION;
 		} else if (status == ListViewStatus.TIMES_FOR_STATION) {
-			status = ListViewStatus.TIMES_FOR_ROUTE;
+//			status = ListViewStatus.TIMES_FOR_ROUTE;
 		} else if (status == ListViewStatus.TIMES_FOR_ROUTE) {
 			status = ListViewStatus.TIMES_FOR_ROUTE;
 		}
@@ -142,27 +145,41 @@ public class CyRideActivity extends Activity {
 		createList(selectedRoute.getId(), selectedStation.getId());
 	}
 	
+	private String getDayOfWeek(int day) {
+		if (day == 0) {
+			return "Weekday";
+		} else if (day == 1) {
+			return "Saturday";
+		} else {
+			return "Sunday";
+		}
+	}
+	
 	@SuppressWarnings("unchecked")
 	private void createList(int routeId, int stationId) {
 		list = new ArrayList<String>();
 		if (status == ListViewStatus.DATE) {
+			tv.setText(R.string.welcome);
 			list = new ArrayList<String>();
 			list.add("Weekday");
 			list.add("Saturday");
 			list.add("Sunday");
 		} else if (status == ListViewStatus.ROUTE) {
+			tv.setText(getDayOfWeek(db.getDayOfWeek()));
 			listIds = db.getRouteNames();
 			list = new ArrayList<String>();
 			for (int i = 0; i < listIds.size(); i++) {
 				list.add(listIds.get(i).getName());				
 			}
 		} else if (status == ListViewStatus.STATIONS && routeId != -1) {
+			tv.setText(getDayOfWeek(db.getDayOfWeek()) + " - " + selectedRoute.getName());
 			listIds = db.getStationNamesForRoute(routeId);
 			list = new ArrayList<String>();
 			for (int i = 0; i < listIds.size(); i++) {
 				list.add(listIds.get(i).getName());				
 			}
 		} else if (status == ListViewStatus.TIMES_FOR_STATION && routeId != -1 && stationId != -1) {
+			tv.setText(getDayOfWeek(db.getDayOfWeek()) + " - " + selectedRoute.getName() + " - " + selectedStation.getName());
 			list = db.getTimesForRouteAndStation(routeId, stationId);
 		} else {
 			listIds = db.getRouteNames();
@@ -322,12 +339,21 @@ public class CyRideActivity extends Activity {
 			View v = convertView;
 			if (v == null) {
 				LayoutInflater vi = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-				v = vi.inflate(R.layout.row, null);
+				if (status == ListViewStatus.TIMES_FOR_STATION || status == ListViewStatus.TIMES_FOR_ROUTE) {
+					v = vi.inflate(R.layout.timerow, null);
+				} else {
+					v = vi.inflate(R.layout.row, null);
+				}
 			}
 			String text = items.get(position);
 			if (text != null) {
 				ImageView iv = (ImageView) v.findViewById(R.id.icon);
-				TextView tt = (TextView) v.findViewById(R.id.label);
+				TextView tt  = null;
+				if (status == ListViewStatus.TIMES_FOR_STATION || status == ListViewStatus.TIMES_FOR_ROUTE) {
+					tt = (TextView) v.findViewById(R.id.labeltime);
+				} else {
+					tt = (TextView) v.findViewById(R.id.label);
+				}
 				
 				if (tt != null) {
 					tt.setText(text);                            
