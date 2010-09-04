@@ -3,24 +3,67 @@
 <head>
 <meta http-equiv="content-type" content="text/html; charset=UTF-8">
 <title>CyRide Routes</title>
+<script type="text/javascript"
+	src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+<script type="text/javascript" src="js/parser.js"></script>
 </head>
 
 <body>
 <h2>CyRide</h2>
-<form action="/GetDataFromURL" method="GET">
-<input type="text" id="url" name="url" size="100"/>
-<input type="submit">
-</form>
 
-<h4>Saturday</h4>
-<p>http://www.cyride.com/routes/Fall/sarede&n.html</p>
+<table cellpadding="5px" style="vertical-align:top">
+<tr>
+<th>Weekday</th>
+<th>Saturday</th>
+<th>Sunday</th>
+</tr>
+<tr>
+<td>
+<input type="checkbox" value="http://www.cyride.com/routes/Fall/wdreds&amp;w.html" />#1 Red South &amp; West<br />
+<input type="checkbox" value="http://www.cyride.com/routes/Fall/wdrede&amp;n.html" />#1 Red East &amp; North<br />
+<input type="checkbox" value="http://www.cyride.com/routes/Fall/wdgreens.html" />#2 Green South &amp; West<br />
+<input type="checkbox" value="http://www.cyride.com/routes/Fall/wdgreene.html" />#2 Green East &amp; North<br />
+<input type="checkbox" value="http://www.cyride.com/routes/Fall/wdblus.html" />#3 Blue South<br />
+<input type="checkbox" value="http://www.cyride.com/routes/Fall/wdbluen.html" />#3 Blue North<br />
+<input type="checkbox" value="http://www.cyride.com/routes/Fall/wdgray.html" />#4 Gray, #4A Gray<br />
+<input type="checkbox" value="http://www.cyride.com/routes/Fall/wdyellow.html" />#5 Yellow<br />
+<input type="checkbox" value="http://www.cyride.com/routes/Fall/wdbrownSouth.html" />#6 Brown South<br />
+<input type="checkbox" value="http://www.cyride.com/routes/Fall/wdbrownNorth.html" />#6 Brown North<br />
+<input type="checkbox" value="http://www.cyride.com/routes/Fall/wdTowers.html" />#6A Towers<br />
+<input type="checkbox" value="http://www.cyride.com/routes/Fall/wdpurple.html" />#7 Purple<br />
+<input type="checkbox" value="http://www.cyride.com/routes/Fall/wdPink.html" />#10 Pink<br />
+<input type="checkbox" value="http://www.cyride.com/routes/Fall/wdCardinal.html" />#21 Cardinal<br />
+<input type="checkbox" value="http://www.cyride.com/routes/Fall/wdgold.html" />#22 Gold<br />
+<input type="checkbox" value="http://www.cyride.com/routes/Fall/wdorange.html" />#23 Orange<br />
+</td>
 
-<h4>Sunday</h4>
-<p>http://www.cyride.com/routes/Fall/sureds.html</p>
-<p>http://www.cyride.com/routes/Fall/surede.html</p>
-<p>http://www.cyride.com/routes/Fall/sugreens.html</p>
-<p>http://www.cyride.com/routes/Fall/sugreene.html</p>
-<p>http://www.cyride.com/routes/Fall/sublues.html</p>
-<p>http://www.cyride.com/routes/Fall/subluen.html</p>
+<td>
+<input type="checkbox" value="http://www.cyride.com/routes/Fall/sareds&w.html" />#1 Red South &amp; West<br /> 
+<input type="checkbox" value="http://www.cyride.com/routes/Fall/sarede&amp;n.html" />#1 Red East &amp; North<br /> 
+<input type="checkbox" value="http://www.cyride.com/routes/Fall/sagreens.html" />#2 Green South &amp; West<br /> 
+<input type="checkbox" value="http://www.cyride.com/routes/Fall/sagreene.html" />#2 Green East &amp; North<br /> 
+<input type="checkbox" value="http://www.cyride.com/routes/Fall/sablues.html" />#3 Blue South<br /> 
+<input type="checkbox" value="http://www.cyride.com/routes/Fall/sabluen.html" />#3 Blue North<br /> 
+<input type="checkbox" value="http://www.cyride.com/routes/Fall/sayellow.html" />#5 Yellow<br /> 
+<input type="checkbox" value="http://www.cyride.com/routes/Fall/sabrown.html" />#6B Brown<br /> 
+<input type="checkbox" value="http://www.cyride.com/routes/Fall/saTowers.html" />#6A Towers<br /> 
+</td>
+
+<td>
+<input type="checkbox" value="http://www.cyride.com/routes/Fall/sureds.html" />#1 Red South &amp; West<br />
+<input type="checkbox" value="http://www.cyride.com/routes/Fall/surede.html" />#1 Red East &amp; North<br />
+<input type="checkbox" value="http://www.cyride.com/routes/Fall/sugreens.html" />#2 Green South &amp; West<br />
+<input type="checkbox" value="http://www.cyride.com/routes/Fall/sugreene.html" />#2 Green East &amp; North<br />
+<input type="checkbox" value="http://www.cyride.com/routes/Fall/sublues.html" />#3 Blue South<br />
+<input type="checkbox" value="http://www.cyride.com/routes/Fall/subluen.html" />#3 Blue North<br />
+<input type="checkbox" value="http://www.cyride.com/routes/Fall/suTowers.html" />#6A Towers<br />
+<input type="checkbox" value="http://www.cyride.com/routes/Fall/SuSilver.html" />#24 Silver<br />
+</td>
+
+</tr>
+</table>
+
+<button id="submit">Submit</button>
+
 </body>
 </html>

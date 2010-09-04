@@ -25,7 +25,7 @@ public class CreateRoute extends HttpServlet {
 
 		try {
 			int time = convertTimeStringToMinute(hour, minute);
-			record = new Route(routeName, Integer.parseInt(routeId), station, Integer.parseInt(stationId), timeString, time, Integer.parseInt(day), 0);
+			record = new Route(routeName, Integer.parseInt(routeId), station, Integer.parseInt(stationId), timeString, time, Integer.parseInt(day), 0,"");
 			pm.makePersistent(record);
 		} finally {
 			pm.close();

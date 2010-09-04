@@ -33,6 +33,8 @@ public class Route {
 	private int day;
 	@Persistent
 	private int rowNum;
+	@Persistent
+	private String specialInstruction;
 	
 	/**
 	 * @param routeName
@@ -40,7 +42,7 @@ public class Route {
 	 * @param station
 	 * @param time
 	 */
-	public Route(String routeName, int routeId, String station, int stationId, String timeString, int time, int day, int rowNum) {
+	public Route(String routeName, int routeId, String station, int stationId, String timeString, int time, int day, int rowNum, String specialInstruction) {
 		this.routeName = routeName;
 		this.routeId = routeId;
 		this.station = station;
@@ -49,6 +51,7 @@ public class Route {
 		this.time = time;
 		this.day = day;
 		this.rowNum = rowNum;
+		this.specialInstruction = specialInstruction;
 	}
 	
 	public String getStation() {
@@ -60,6 +63,6 @@ public class Route {
 	}
 
 	public String toString() {
-		return "{\"routeid\":"+routeId+",\"routename\":\""+routeName+"\",\"station\":\""+station+"\",\"stationid\":"+stationId+",\"timestring\":\""+timeString+"\",\"time\":"+time+",\"dayofweek\":"+day+",\"rownum\":"+rowNum+"}";
+		return "{\"routeid\":"+routeId+",\"routename\":\""+routeName+"\",\"station\":\""+station+"\",\"stationid\":"+stationId+",\"timestring\":\""+timeString+"\",\"time\":"+time+",\"dayofweek\":"+day+",\"rownum\":"+rowNum+",\"specialinstruction\":\""+specialInstruction+"\"}";
 	}
 }

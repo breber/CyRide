@@ -19,9 +19,8 @@ public class GetDataFromURL extends HttpServlet {
 		
 		String route = "", dayOfWeek = "";
 		
-		String urlString = req.getParameter("url");
+		String urlString = req.getParameter("url").replaceAll("AND", "&");
 		URL url = new URL(urlString);
-
 		Scanner scan = new Scanner(url.openConnection().getInputStream());
 		String temp = "";
 		StringBuilder temp1 = new StringBuilder();
@@ -93,7 +92,9 @@ public class GetDataFromURL extends HttpServlet {
 					try {
 						if (tdArray[i].substring(tdArray[i].indexOf("<td>")+4).trim().matches("^\\d?\\d:\\d\\d$")) {
 							lists.get(i).add(tdArray[i].substring(tdArray[i].indexOf("<td>")+4).trim());
-						} else {
+						} /*else if (tdArray[i].contains("+") || tdArray[i].contains("Request")) {
+							lists.get(i).add(tdArray[i].substring(tdArray[i].indexOf("<td>")+4).trim());
+						} */else {
 							lists.get(i).add("---");
 						}
 					} catch (IndexOutOfBoundsException e){lists.get(i).add("---");}
@@ -119,11 +120,16 @@ public class GetDataFromURL extends HttpServlet {
 						isMorning = false;
 					int routeId = (emptyLocation == 0) ? lists.indexOf(l) : (1 + lists.indexOf(l));
 					Route r = new Route(route, getRouteId(route), name, routeId, s, convertTimeStringToMinute(s.substring(0, s.indexOf(":")), 
-							s.substring(s.indexOf(":")+1), isMorning), getDayOfWeek(dayOfWeek), j);
+							s.substring(s.indexOf(":")+1), isMorning), getDayOfWeek(dayOfWeek), j, "");
 					previousTime = convertTimeStringToMinute(s.substring(0, s.indexOf(":")), 
 							s.substring(s.indexOf(":")+1), isMorning);
 					routes.add(r);
-				}
+				} /*else if (s.contains("+") || s.contains("Request")) {
+					int routeId = (emptyLocation == 0) ? lists.indexOf(l) : (1 + lists.indexOf(l));
+					Route r = new Route(route, getRouteId(route), name, routeId, s, previousTime + 1, getDayOfWeek(dayOfWeek), j, "");
+					previousTime++;
+					routes.add(r);
+				}*/
 				sb.append("<time><num>"+s+"</num><rownum>"+j+"</rownum></time>");
 			}
 			sb.append("</station>");
@@ -136,7 +142,7 @@ public class GetDataFromURL extends HttpServlet {
 
 		try {
 //			Query q = pm.newQuery(Route.class);
-//			q.setFilter("routeId == 2");
+//			q.setFilter("routeId == 11");
 //			q.setFilter("day == 1");
 //			q.deletePersistentAll();
 			for (Route r : routes) {
@@ -167,9 +173,18 @@ public class GetDataFromURL extends HttpServlet {
 		if (name.contains("2") && name.contains("East")) return 3;
 		if (name.contains("3") && name.contains("South")) return 4;
 		if (name.contains("3") && name.contains("North")) return 5;
-		if (name.contains("6") && name.contains("Brown")) return 6;
+		if (name.contains("6B") || (name.contains("6") && name.contains("Brown") && name.contains("South"))) return 6;
 		if (name.contains("6A") && name.contains("Towers")) return 7;
 		if (name.contains("5") && name.contains("Yellow")) return 8;
+		if (name.contains("4") && name.contains("Gray")) return 9;
+		if (name.contains("6") && name.contains("Brown") && name.contains("North")) return 10;
+		if (name.contains("7") && name.contains("Purple")) return 11;
+		if (name.contains("10") && name.contains("Pink")) return 12;
+		if (name.contains("21") && name.contains("Cardinal")) return 13;
+		if (name.contains("22") && name.contains("Gold")) return 14;
+		if (name.contains("23") && name.contains("Orange")) return 15;
+		if (name.contains("24") && name.contains("Silver")) return 16;
+		
 		else return -1;
 	}
 }
