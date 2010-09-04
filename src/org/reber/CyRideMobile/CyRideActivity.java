@@ -1,10 +1,11 @@
 package org.reber.CyRideMobile;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -39,9 +40,12 @@ public class CyRideActivity extends Activity {
 	private ListView lv;
 	private Adapter adapter;
 	
+	private List<String> list;
+	private List<NameIdWrapper> listIds;
+	
 	private static ListViewStatus status;
 	
-	private int selectedRoute, selectedStation;
+	private NameIdWrapper selectedRoute, selectedStation;
 	
 	/** Called when the activity is first created. */
 	@Override
@@ -60,6 +64,11 @@ public class CyRideActivity extends Activity {
 			db.setDayOfWeek(0);
 		}
 
+		selectedRoute = new NameIdWrapper("", -1);
+		selectedStation = new NameIdWrapper("", -1);
+		list = new ArrayList<String>();
+		listIds = new ArrayList<NameIdWrapper>();
+		
 		lv = (ListView) findViewById(R.id.ListView);
 		
 		lv.setOnItemClickListener(new OnItemClickListener() {
@@ -72,16 +81,16 @@ public class CyRideActivity extends Activity {
 				if (status != ListViewStatus.TIMES_FOR_ROUTE) {
 					moveStatusForward();
 					if (status == ListViewStatus.ROUTE) {
-						selectedRoute = -1;
-						selectedStation = -1;
-						createList(selectedRoute, selectedStation);
+						selectedRoute = new NameIdWrapper("",-1);
+						selectedStation = new NameIdWrapper("",-1);
+						createList(selectedRoute.getId(), selectedStation.getId());
 					} else if (status == ListViewStatus.STATIONS) {
-						selectedRoute = arg2;
-						selectedStation = -1;
-						createList(selectedRoute, selectedStation);
+						selectedRoute = listIds.get(arg2);
+						selectedStation = new NameIdWrapper("",-1);
+						createList(selectedRoute.getId(), selectedStation.getId());
 					} else if (status == ListViewStatus.TIMES_FOR_STATION) {
-						selectedStation = arg2 + 1;
-						createList(selectedRoute, selectedStation);
+						selectedStation = listIds.get(arg2);
+						createList(selectedRoute.getId(), selectedStation.getId());
 					}
 				}
 			}
@@ -130,30 +139,46 @@ public class CyRideActivity extends Activity {
 		
 		Log.d("STATUS", "Back Pressed - moved to: " + status.name());
 		
-		createList(selectedRoute, selectedStation);
+		createList(selectedRoute.getId(), selectedStation.getId());
 	}
 	
 	@SuppressWarnings("unchecked")
 	private void createList(int routeId, int stationId) {
-		List<String> list = new ArrayList<String>();
+		list = new ArrayList<String>();
 		if (status == ListViewStatus.DATE) {
 			list = new ArrayList<String>();
 			list.add("Weekday");
 			list.add("Saturday");
 			list.add("Sunday");
 		} else if (status == ListViewStatus.ROUTE) {
-			list = db.getRouteNames();
+			listIds = db.getRouteNames();
+			list = new ArrayList<String>();
+			for (int i = 0; i < listIds.size(); i++) {
+				list.add(listIds.get(i).getName());				
+			}
 		} else if (status == ListViewStatus.STATIONS && routeId != -1) {
-			list = db.getStationNamesForRoute(routeId);
+			listIds = db.getStationNamesForRoute(routeId);
+			list = new ArrayList<String>();
+			for (int i = 0; i < listIds.size(); i++) {
+				list.add(listIds.get(i).getName());				
+			}
 		} else if (status == ListViewStatus.TIMES_FOR_STATION && routeId != -1 && stationId != -1) {
 			list = db.getTimesForRouteAndStation(routeId, stationId);
 		} else {
-			list = db.getRouteNames();
+			listIds = db.getRouteNames();
 		}
 		
 		Log.d("LIST", list.size()+"");
 		
-		adapter = new CyRideListAdapter(this, android.R.layout.simple_list_item_1, list);
+		int layout;
+		
+		if (status == ListViewStatus.TIMES_FOR_STATION || status == ListViewStatus.TIMES_FOR_ROUTE) {
+			layout = android.R.layout.simple_list_item_2;
+		} else {
+			layout = android.R.layout.simple_list_item_1;
+		}
+		
+		adapter = new CyRideListAdapter(this, layout, list);
 
 		lv.setAdapter((ArrayAdapter<String>) adapter);
 	}
@@ -259,16 +284,18 @@ public class CyRideActivity extends Activity {
 	}
 
 	private String getData() throws MalformedURLException, IOException {
-		String url = "http://cyridesql.appspot.com/getroutes";
-		URLConnection connection = new URL(url).openConnection();
-		connection.connect();
-		InputStream is = connection.getInputStream();
-		int ch; 
-		StringBuffer sb = new StringBuffer(); 
-		while( ( ch = is.read() ) != -1 ) { 
-			sb.append( (char)ch ); 
-		} 
-		is.close(); 
+		String urlStr = "http://cyridesql.appspot.com/getroutes";
+		
+		URL url = new URL(urlStr);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+		StringBuilder sb = new StringBuilder();
+		String temp = reader.readLine();
+		
+		while (temp != null) {
+			sb.append(temp);
+			temp = reader.readLine();
+		}
 
 		return sb.toString();
 	}
@@ -315,8 +342,9 @@ public class CyRideActivity extends Activity {
 				if (status == ListViewStatus.ROUTE) {
 					temp = text;
 				} else {
-					temp = db.getNameOfRouteById(selectedRoute);
+					temp = selectedRoute.getName();
 				}
+				
 				if (temp.contains("Red")) {
 					iv.setImageResource(R.drawable.red);
 				} else if (temp.contains("Blue")) {
@@ -327,6 +355,12 @@ public class CyRideActivity extends Activity {
 					iv.setImageResource(R.drawable.brown);
 				} else if (temp.contains("Yellow")) {
 					iv.setImageResource(R.drawable.yellow);
+				} else if (temp.contains("Orange")) {
+					iv.setImageResource(R.drawable.orange);
+				} else if (temp.contains("Pink")) {
+					iv.setImageResource(R.drawable.pink);
+				} else if (temp.contains("Purple")) {
+					iv.setImageResource(R.drawable.purple);
 				}
 			}
 			return v;

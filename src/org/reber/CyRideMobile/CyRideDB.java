@@ -48,7 +48,7 @@ public class CyRideDB
 		this.context = ctx;
 		open();
 	}
-	
+
 	public void open() 
 	{
 		DBHelper = new DatabaseHelper(context);
@@ -90,7 +90,7 @@ public class CyRideDB
 	public Cursor getAllRoutes() 
 	{
 		SQLiteDatabase db = DBHelper.getReadableDatabase();
-//		List<String> list = new ArrayList<String>();
+		//		List<String> list = new ArrayList<String>();
 		Cursor c = null;
 		try {
 			String query = "SELECT * FROM " + DATABASE_TABLE;
@@ -98,7 +98,7 @@ public class CyRideDB
 		} finally {
 			db.close();
 		}
-		
+
 		return c;
 	}
 
@@ -119,6 +119,7 @@ public class CyRideDB
 		int temp;
 		try {
 			String subquery = "SELECT " + KEY_STATIONNAME + " FROM " + DATABASE_TABLE;
+			Log.d("QUERY", subquery);
 			c = db.rawQuery(subquery, null);
 			temp = c.getCount();
 		} finally {
@@ -135,66 +136,72 @@ public class CyRideDB
 		String name = "";
 		try {
 			String subquery = "SELECT DISTINCT " + KEY_ROUTENAME + " FROM " + DATABASE_TABLE + " WHERE " + 
-				KEY_DAY + " = " + dayOfWeek + " AND " + KEY_ROUTEID + " = " + id;
+			KEY_DAY + " = " + dayOfWeek + " AND " + KEY_ROUTEID + " = " + id;
+			Log.d("QUERY", subquery);
 			c = db.rawQuery(subquery, null);
 			c.moveToFirst();
-			name = c.getString(c.getColumnIndex(KEY_ROUTENAME));
+			if (c.getCount() > 1)
+				name = c.getString(c.getColumnIndex(KEY_ROUTENAME));
 		} finally {
 			c.close();
 			db.close();
 		}
 		return name;
 	}
-	
-	public List<String> getRouteNames() 
+
+	public List<NameIdWrapper> getRouteNames() 
 	{
 		SQLiteDatabase db = DBHelper.getReadableDatabase();
-		List<String> list = new ArrayList<String>();
+		List<NameIdWrapper> list = new ArrayList<NameIdWrapper>();
 		Cursor c = null;
 		try {
-			String subquery = "SELECT DISTINCT " + KEY_ROUTENAME + " FROM " + DATABASE_TABLE + " WHERE " + KEY_DAY + " = " + dayOfWeek;
+			String subquery = "SELECT DISTINCT " + KEY_ROUTENAME + ", " + KEY_ROUTEID + " FROM " + DATABASE_TABLE + " WHERE " + KEY_DAY + " = " + dayOfWeek;
 			Log.d("QUERY", subquery);
 			c = db.rawQuery(subquery, null);
 			c.moveToFirst();
-			
-			do {
-				list.add(c.getString(c.getColumnIndex(KEY_ROUTENAME)).replaceAll("&amp;", "&"));
-				if (!c.isLast())
-					c.moveToNext();
-			} while (!c.isLast());
+			if (c.getCount() > 1) {
+				do {
+					list.add(new NameIdWrapper(c.getString(c.getColumnIndex(KEY_ROUTENAME)).replaceAll("&amp;", "&"),
+							c.getInt(c.getColumnIndex(KEY_ROUTEID))));
+					if (!c.isLast())
+						c.moveToNext();
+				} while (!c.isLast());
+			}
 		} finally {
 			if (c != null)
 				c.close();
 			db.close();
 		}
-		
+
 		return list;
 	}
 
-	public List<String> getStationNamesForRoute(int routeId) 
+	public List<NameIdWrapper> getStationNamesForRoute(int routeId) 
 	{
 		SQLiteDatabase db = DBHelper.getReadableDatabase();
-		List<String> list = new ArrayList<String>();
+		List<NameIdWrapper> list = new ArrayList<NameIdWrapper>();
 		Cursor c = null;
 		try {
-			String subquery = "SELECT DISTINCT " + KEY_STATIONNAME + " FROM " + DATABASE_TABLE + 
-				" WHERE " + KEY_DAY + " = " + dayOfWeek + " AND " + KEY_ROUTEID + " = " + routeId + " ORDER BY " + KEY_STATIONID;
+			String subquery = "SELECT DISTINCT " + KEY_STATIONNAME + ", " + KEY_STATIONID + " FROM " + DATABASE_TABLE + 
+			" WHERE " + KEY_DAY + " = " + dayOfWeek + " AND " + KEY_ROUTEID + " = " + routeId + " ORDER BY " + KEY_STATIONID;
 			Log.d("QUERY", subquery);
 			c = db.rawQuery(subquery, null);
 			c.moveToFirst();
-			
-			do {
-				list.add(c.getString(c.getColumnIndex(KEY_STATIONNAME)).replaceAll("&amp;", "&"));
-				if (!c.isLast())
-					c.moveToNext();
-			} while (!c.isLast());
-			
+
+			if (c.getCount() > 1) {
+				do {
+					list.add(new NameIdWrapper(c.getString(c.getColumnIndex(KEY_STATIONNAME)).replaceAll("&amp;", "&"),
+							c.getInt(c.getColumnIndex(KEY_STATIONID))));
+					if (!c.isLast())
+						c.moveToNext();
+				} while (!c.isLast());
+			}
 		} finally { 
 			if (c != null)
 				c.close();
 			db.close();
 		}
-		
+
 		return list;
 	}
 
@@ -205,22 +212,23 @@ public class CyRideDB
 		Cursor c = null;
 		try {
 			String subquery = "SELECT " + KEY_TIMESTRING + " FROM " + DATABASE_TABLE + " WHERE " + KEY_DAY + " = " + dayOfWeek + 
-				" AND " + KEY_ROUTEID + " = " + routeId + " AND " + KEY_STATIONID + " = " + stationId + " ORDER BY " + KEY_TIME;
+			" AND " + KEY_ROUTEID + " = " + routeId + " AND " + KEY_STATIONID + " = " + stationId + " ORDER BY " + KEY_TIME;
 			Log.d("QUERY", subquery);
 			c = db.rawQuery(subquery, null);
 			c.moveToFirst();
-			
-			do {
-				list.add(c.getString(c.getColumnIndex(KEY_TIMESTRING)));
-				if (!c.isLast())
-					c.moveToNext();
-			} while (!c.isLast());
+			if (c.getCount() > 1) {
+				do {
+					list.add(c.getString(c.getColumnIndex(KEY_TIMESTRING)));
+					if (!c.isLast())
+						c.moveToNext();
+				} while (!c.isLast());
+			}
 		} finally {
 			if (c != null)
 				c.close();
 			db.close();
 		}
-		
+
 		return list;
 	}
 
@@ -230,7 +238,7 @@ public class CyRideDB
 		{
 			super(context, DATABASE_NAME, null, DATABASE_VERSION);
 		}
-		
+
 		@Override
 		public void onCreate(SQLiteDatabase db) 
 		{
