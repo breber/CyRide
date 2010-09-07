@@ -43,6 +43,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+/**
+ * The entry point for the CyRide Android app.
+ * 
+ * @author brianreber
+ */
 public class CyRideActivity extends Activity {
 	private JSONObject json;
 	private CyRideDB db;
@@ -126,7 +131,7 @@ public class CyRideActivity extends Activity {
 		} else if (status == ListViewStatus.STATIONS) {
 			status = ListViewStatus.TIMES_FOR_STATION;
 		} else if (status == ListViewStatus.TIMES_FOR_STATION) {
-			//			status = ListViewStatus.TIMES_FOR_ROUTE;
+//			status = ListViewStatus.TIMES_FOR_ROUTE;
 		} else if (status == ListViewStatus.TIMES_FOR_ROUTE) {
 			status = ListViewStatus.TIMES_FOR_ROUTE;
 		}

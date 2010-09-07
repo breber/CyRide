@@ -12,8 +12,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 /**
+ * A Database Wrapper for CyRide Scheduling
+ * 
  * @author brianreber
- *
  */
 public class CyRideDB 
 {
@@ -26,7 +27,7 @@ public class CyRideDB
 	public static final String KEY_TIME = "time";
 	public static final String KEY_DAY = "day";
 	public static final String KEY_ROWNUM = "rownum";
-	private static final String TAG = "DBAdapter";
+	private static final String TAG = "CyRideDB";
 
 	private static final String DATABASE_NAME = "cyride.db";
 	private static final String DATABASE_TABLE = "cyride";
@@ -41,22 +42,19 @@ public class CyRideDB
 
 	private final Context context; 
 
-	private DatabaseHelper DBHelper;
+	private DatabaseHelper dbHelper;
 
-	public CyRideDB(Context ctx) 
-	{
+	public CyRideDB(Context ctx) {
 		this.context = ctx;
 		open();
 	}
 
-	public void open() 
-	{
-		DBHelper = new DatabaseHelper(context);
+	public void open() {
+		dbHelper = new DatabaseHelper(context);
 	}
 
-	public void close() 
-	{
-		DBHelper.close();
+	public void close() {
+		dbHelper.close();
 	}
 
 	public void setDayOfWeek(int dOW) {
@@ -68,9 +66,8 @@ public class CyRideDB
 	}
 
 	public void insertRoute(int routeId, String routeName, String station, int stationId, String timeString,
-			int time, int dayOfWeek, int rowNum) 
-	{
-		SQLiteDatabase db = DBHelper.getWritableDatabase();
+			int time, int dayOfWeek, int rowNum) {
+		SQLiteDatabase db = dbHelper.getWritableDatabase();
 		try {
 			ContentValues initialValues = new ContentValues();
 			initialValues.put(KEY_ROUTEID, routeId);
@@ -87,10 +84,8 @@ public class CyRideDB
 		}
 	}
 
-	public Cursor getAllRoutes() 
-	{
-		SQLiteDatabase db = DBHelper.getReadableDatabase();
-		//		List<String> list = new ArrayList<String>();
+	public Cursor getAllRoutes() {
+		SQLiteDatabase db = dbHelper.getReadableDatabase();
 		Cursor c = null;
 		try {
 			String query = "SELECT * FROM " + DATABASE_TABLE;
@@ -102,9 +97,8 @@ public class CyRideDB
 		return c;
 	}
 
-	public void deleteAllRoutes() 
-	{
-		SQLiteDatabase db = DBHelper.getWritableDatabase();
+	public void deleteAllRoutes() {
+		SQLiteDatabase db = dbHelper.getWritableDatabase();
 		try {
 			db.execSQL("DROP TABLE " + DATABASE_TABLE);
 		} finally {
@@ -112,9 +106,8 @@ public class CyRideDB
 		}
 	}
 
-	public int getCountRoute() 
-	{
-		SQLiteDatabase db = DBHelper.getReadableDatabase();
+	public int getCountRoute() {
+		SQLiteDatabase db = dbHelper.getReadableDatabase();
 		Cursor c = null;
 		int temp;
 		try {
@@ -129,9 +122,8 @@ public class CyRideDB
 		return temp;
 	}
 	
-	public String getNameOfRouteById(int id) 
-	{
-		SQLiteDatabase db = DBHelper.getReadableDatabase();
+	public String getNameOfRouteById(int id) {
+		SQLiteDatabase db = dbHelper.getReadableDatabase();
 		Cursor c = null;
 		String name = "";
 		try {
@@ -149,23 +141,22 @@ public class CyRideDB
 		return name;
 	}
 
-	public List<NameIdWrapper> getRouteNames() 
-	{
-		SQLiteDatabase db = DBHelper.getReadableDatabase();
+	public List<NameIdWrapper> getRouteNames() {
+		SQLiteDatabase db = dbHelper.getReadableDatabase();
 		Log.d("DB",db.getPath());
 		List<NameIdWrapper> list = new ArrayList<NameIdWrapper>();
 		Cursor c = null;
 		try {
-			String subquery = "SELECT DISTINCT " + KEY_ROUTENAME + ", " + KEY_ROUTEID + " FROM " + DATABASE_TABLE + " WHERE " + KEY_DAY + " = " + dayOfWeek;
+			String subquery = "SELECT DISTINCT " + KEY_ROUTENAME + ", " + KEY_ROUTEID + " FROM " + DATABASE_TABLE + " WHERE " + KEY_DAY + " = " + dayOfWeek
+			 + " ORDER BY " + KEY_ROUTEID;
 			Log.d("QUERY", subquery);
 			c = db.rawQuery(subquery, null);
-			c.moveToFirst();
+			Log.d("SIZE", c.getCount()+"");
 			if (c.getCount() > 1) {
 				do {
+					c.moveToNext();
 					list.add(new NameIdWrapper(c.getString(c.getColumnIndex(KEY_ROUTENAME)).replaceAll("&amp;", "&"),
 							c.getInt(c.getColumnIndex(KEY_ROUTEID))));
-					if (!c.isLast())
-						c.moveToNext();
 				} while (!c.isLast());
 			}
 		} finally {
@@ -177,9 +168,8 @@ public class CyRideDB
 		return list;
 	}
 
-	public List<NameIdWrapper> getStationNamesForRoute(int routeId) 
-	{
-		SQLiteDatabase db = DBHelper.getReadableDatabase();
+	public List<NameIdWrapper> getStationNamesForRoute(int routeId) {
+		SQLiteDatabase db = dbHelper.getReadableDatabase();
 		List<NameIdWrapper> list = new ArrayList<NameIdWrapper>();
 		Cursor c = null;
 		try {
@@ -187,14 +177,11 @@ public class CyRideDB
 			" WHERE " + KEY_DAY + " = " + dayOfWeek + " AND " + KEY_ROUTEID + " = " + routeId + " ORDER BY " + KEY_STATIONID;
 			Log.d("QUERY", subquery);
 			c = db.rawQuery(subquery, null);
-			c.moveToFirst();
-
 			if (c.getCount() > 1) {
 				do {
+					c.moveToNext();
 					list.add(new NameIdWrapper(c.getString(c.getColumnIndex(KEY_STATIONNAME)).replaceAll("&amp;", "&"),
 							c.getInt(c.getColumnIndex(KEY_STATIONID))));
-					if (!c.isLast())
-						c.moveToNext();
 				} while (!c.isLast());
 			}
 		} finally { 
@@ -206,9 +193,8 @@ public class CyRideDB
 		return list;
 	}
 
-	public List<String> getTimesForRouteAndStation(int routeId, int stationId) 
-	{
-		SQLiteDatabase db = DBHelper.getReadableDatabase();
+	public List<String> getTimesForRouteAndStation(int routeId, int stationId) {
+		SQLiteDatabase db = dbHelper.getReadableDatabase();
 		List<String> list = new ArrayList<String>();
 		Cursor c = null;
 		try {
@@ -216,12 +202,10 @@ public class CyRideDB
 			" AND " + KEY_ROUTEID + " = " + routeId + " AND " + KEY_STATIONID + " = " + stationId + " ORDER BY " + KEY_TIME;
 			Log.d("QUERY", subquery);
 			c = db.rawQuery(subquery, null);
-			c.moveToFirst();
 			if (c.getCount() > 1) {
 				do {
+					c.moveToNext();
 					list.add(c.getString(c.getColumnIndex(KEY_TIMESTRING)));
-					if (!c.isLast())
-						c.moveToNext();
 				} while (!c.isLast());
 			}
 		} finally {
@@ -232,26 +216,21 @@ public class CyRideDB
 
 		return list;
 	}
-
+	
 	private static class DatabaseHelper extends SQLiteOpenHelper 
 	{
-		DatabaseHelper(Context context) 
-		{
+		DatabaseHelper(Context context) {
 			super(context, DATABASE_NAME, null, DATABASE_VERSION);
 		}
 
 		@Override
-		public void onCreate(SQLiteDatabase db) 
-		{
+		public void onCreate(SQLiteDatabase db) {
 			db.execSQL(DATABASE_CREATE);
 		}
 
 		@Override
-		public void onUpgrade(SQLiteDatabase db, int oldVersion, 
-				int newVersion) 
-		{
-			Log.w(TAG, "Upgrading database from version " + oldVersion 
-					+ " to " + newVersion + ", which will destroy all old data");
+		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+			Log.w(TAG, "Upgrading database from version " + oldVersion + " to " + newVersion + ", which will destroy all old data");
 			db.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE);
 			onCreate(db);
 		}
