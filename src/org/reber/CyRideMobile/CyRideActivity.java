@@ -32,7 +32,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -105,14 +104,14 @@ public class CyRideActivity extends Activity {
 					if (status == ListViewStatus.ROUTE) {
 						selectedRoute = new NameIdWrapper("",-1);
 						selectedStation = new NameIdWrapper("",-1);
-						createList(selectedRoute.getId(), selectedStation.getId());
+						createList();
 					} else if (status == ListViewStatus.STATIONS) {
 						selectedRoute = listIds.get(arg2);
 						selectedStation = new NameIdWrapper("",-1);
-						createList(selectedRoute.getId(), selectedStation.getId());
+						createList();
 					} else if (status == ListViewStatus.TIMES_FOR_STATION) {
 						selectedStation = listIds.get(arg2);
-						createList(selectedRoute.getId(), selectedStation.getId());
+						createList();
 					}
 				}
 			}
@@ -120,13 +119,16 @@ public class CyRideActivity extends Activity {
 
 		if (getCount() > 0) {
 			status = ListViewStatus.ROUTE;
-			createList(-1, -1);
+			createList();
 		} else {
 			status = ListViewStatus.ROUTE;
 			new ImportDatabaseFileTask().execute();
 		}
 	}
 
+	/**
+	 * Move the status of the ListView forward
+	 */
 	private void moveStatusForward() {
 		if (status == ListViewStatus.DATE) {
 			status = ListViewStatus.ROUTE;
@@ -139,7 +141,6 @@ public class CyRideActivity extends Activity {
 		} else if (status == ListViewStatus.TIMES_FOR_ROUTE) {
 			status = ListViewStatus.TIMES_FOR_ROUTE;
 		}
-		Log.d("STATUS", "Moved Forward To: " + status.name());
 	}
 
 	/* (non-Javadoc)
@@ -159,23 +160,35 @@ public class CyRideActivity extends Activity {
 			status = ListViewStatus.TIMES_FOR_STATION;
 		}
 
-		Log.d("STATUS", "Back Pressed - moved to: " + status.name());
-
-		createList(selectedRoute.getId(), selectedStation.getId());
+		createList();
 	}
 
+	/**
+	 * Gets the String representation of the given int day
+	 * 
+	 * @param day
+	 * @return
+	 * Weekday if day = 0<br />
+	 * Saturday if day = 1<br />
+	 * Sunday if day = 2<br />
+	 */
 	private String getDayOfWeek(int day) {
 		if (day == 0) {
 			return "Weekday";
 		} else if (day == 1) {
 			return "Saturday";
-		} else {
+		} else if (day == 2){
 			return "Sunday";
 		}
+		
+		throw new IllegalArgumentException("day should be between 0-3");
 	}
 
 	@SuppressWarnings("unchecked")
-	private void createList(int routeId, int stationId) {
+	/**
+	 * Creates the ListView based on the current status
+	 */
+	private void createList() {
 		list = new ArrayList<String>();
 		if (status == ListViewStatus.DATE) {
 			tv.setText(R.string.welcome);
@@ -190,21 +203,19 @@ public class CyRideActivity extends Activity {
 			for (int i = 0; i < listIds.size(); i++) {
 				list.add(listIds.get(i).getName());				
 			}
-		} else if (status == ListViewStatus.STATIONS && routeId != -1) {
+		} else if (status == ListViewStatus.STATIONS && selectedRoute.getId() != -1) {
 			tv.setText(getDayOfWeek(db.getDayOfWeek()) + " - " + selectedRoute.getName());
-			listIds = db.getStationNamesForRoute(routeId);
+			listIds = db.getStationNamesForRoute(selectedRoute.getId());
 			list = new ArrayList<String>();
 			for (int i = 0; i < listIds.size(); i++) {
 				list.add(listIds.get(i).getName());				
 			}
-		} else if (status == ListViewStatus.TIMES_FOR_STATION && routeId != -1 && stationId != -1) {
+		} else if (status == ListViewStatus.TIMES_FOR_STATION && selectedRoute.getId() != -1 && selectedStation.getId() != -1) {
 			tv.setText(getDayOfWeek(db.getDayOfWeek()) + " - " + selectedRoute.getName() + " - " + selectedStation.getName());
-			list = db.getTimesForRouteAndStation(routeId, stationId);
+			list = db.getTimesForStation(selectedRoute.getId(), selectedStation.getId());
 		} else {
 			listIds = db.getRouteNames();
 		}
-
-		Log.d("LIST", list.size()+"");
 
 		int layout;
 
@@ -221,9 +232,9 @@ public class CyRideActivity extends Activity {
 
 	/**
 	 * Gets called when the menu button is pressed.
-	 * param menu
-	 * The menu instance that we apply a menu to
 	 * 
+	 * @param menu
+	 * The menu instance that we apply a menu to
 	 * @return
 	 * true so that it uses our own implementation
 	 */
@@ -240,7 +251,7 @@ public class CyRideActivity extends Activity {
 		String menuTitle = item.getTitle().toString();
 
 		if (menuTitle.equals("Update Data From Server")) {
-			getDataProcess(true);
+			getDataProcess();
 		}
 		if (menuTitle.equals("Count SQL Records")) {
 			Dialog d = new Dialog(CyRideActivity.this);
@@ -286,7 +297,11 @@ public class CyRideActivity extends Activity {
 		db.open();
 	}
 
-	private void getDataProcess(final boolean loadView) {
+	/**
+	 * Gets data from the AppEngine Database and resets the in-app database with the new
+	 * data from the server.
+	 */
+	private void getDataProcess() {
 		final ProgressDialog prompt = new ProgressDialog(this);
 		prompt.setMessage("Loading...");
 
@@ -302,13 +317,8 @@ public class CyRideActivity extends Activity {
 					handler.post(new Runnable() {
 						@Override
 						public void run() {
-							try {
-								if (loadView) {
-									createList(-1, -1);
-								}
-							} finally {
-								prompt.dismiss();
-							}
+							createList();
+							prompt.dismiss();
 						}
 					});
 				} catch (Exception e) {		} 
@@ -318,46 +328,49 @@ public class CyRideActivity extends Activity {
 		prompt.show();
 	}
 
+	/**
+	 * Gets the number of rows in the database
+	 * 
+	 * @return
+	 * The number of rows in the database
+	 */
 	private int getCount() {
 		return db.getCountRoute();
 	}
 
+	/**
+	 * Gets the string of data from the server
+	 */
 	private String getData() throws MalformedURLException, IOException {
 		String urlStr = "http://cyridesql.appspot.com/getroutes";
 
 		HttpClient httpclient = new DefaultHttpClient();
-		 
-        // Prepare a request object
         HttpGet httpget = new HttpGet(urlStr);
-        
         HttpResponse response;
+        
         try {
             response = httpclient.execute(httpget);
-            // Examine the response status
-            Log.i("Praeda",response.getStatusLine().toString());
- 
-            // Get hold of the response entity
             HttpEntity entity = response.getEntity();
-            // If the response does not enclose an entity, there is no need
-            // to worry about connection release
- 
+            
             if (entity != null) {
                 InputStream instream = entity.getContent();
                 return convertStreamToString(instream);
             }
-        } catch (IOException e) {
-        	
-		}
+        } catch (IOException e) {		}
+        
+        //If we get here, that means there was an error
 		return null;
 	}
 	
-	private static String convertStreamToString(InputStream is) {
-        /*
-         * To convert the InputStream to String we use the BufferedReader.readLine()
-         * method. We iterate until the BufferedReader return null which means
-         * there's no more data to read. Each line will appended to a StringBuilder
-         * and returned as String.
-         */
+	/**
+	 * Converts an InputStream to a String
+	 * 
+	 * @param is
+	 * The InputStream to convert
+	 * @return
+	 * The String contained in the InputStream
+	 */
+	private String convertStreamToString(InputStream is) {
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
         StringBuilder sb = new StringBuilder();
  
@@ -378,6 +391,11 @@ public class CyRideActivity extends Activity {
         return sb.toString();
     }
 
+	/**
+	 * Adds the records from the JSON string to the database
+	 * 
+	 * @throws JSONException
+	 */
 	private void addRecords() throws JSONException {
 		JSONArray array = json.getJSONArray("records");
 		List<Route> routes = new ArrayList<Route>();
@@ -390,6 +408,9 @@ public class CyRideActivity extends Activity {
 		db.insertRoute(routes);
 	}
 	
+	/**
+	 * Exports the database to the SD card
+	 */
 	private void exportDB() {
 		new ExportDatabaseFileTask().execute();
 	}
@@ -498,8 +519,7 @@ public class CyRideActivity extends Activity {
 				this.dialog.dismiss();
 			}
 			if (success) {
-				createList(-1, -1);
-//				Toast.makeText(CyRideActivity.this, "Transfer successful!", Toast.LENGTH_SHORT).show();
+				createList();
 			} else {
 				Toast.makeText(CyRideActivity.this, "Transfer failed.", Toast.LENGTH_SHORT).show();
 			}
@@ -560,7 +580,5 @@ public class CyRideActivity extends Activity {
 					outChannel.close();
 			}
 		}
-
 	}
-
 }

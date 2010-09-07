@@ -1,8 +1,10 @@
 package org.reber.CyRideMobile;
 
 /**
+ * A wrapper for a Name and Id - usefull in returing a Station Name and its Id
+ * for easier SQL queries
+ * 
  * @author brianreber
- *
  */
 public class NameIdWrapper {
 

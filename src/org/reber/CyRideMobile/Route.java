@@ -1,9 +1,10 @@
 package org.reber.CyRideMobile;
 
-
 /**
+ * An implementation of a Route that can be persisted into our databases.
+ * 
+ * 
  * @author brianreber
- *
  */
 public class Route {
 
@@ -15,12 +16,18 @@ public class Route {
 	private int time;
 	private int day;
 	private int rowNum;
-	
+
 	/**
+	 * Creates a Route with the given parameters.
+	 * 
 	 * @param routeName
 	 * @param routeId
 	 * @param station
+	 * @param stationId
+	 * @param timeString
 	 * @param time
+	 * @param day
+	 * @param rowNum
 	 */
 	public Route(String routeName, int routeId, String station, int stationId, String timeString, int time, int day, int rowNum) {
 		this.routeName = routeName;
@@ -32,12 +39,6 @@ public class Route {
 		this.day = day;
 		this.rowNum = rowNum;
 	}
-	
-
-	public String toString() {
-		return "{\"routeid\":"+routeId+",\"routename\":\""+routeName+"\",\"station\":\""+station+"\",\"stationid\":"+stationId+",\"timestring\":\""+timeString+"\",\"time\":"+time+",\"dayofweek\":"+day+",\"rownum\":"+rowNum+"}";
-	}
-
 
 	/**
 	 * @return the routeName
@@ -46,14 +47,12 @@ public class Route {
 		return routeName;
 	}
 
-
 	/**
 	 * @return the routeId
 	 */
 	public int getRouteId() {
 		return routeId;
 	}
-
 
 	/**
 	 * @return the station
@@ -62,14 +61,12 @@ public class Route {
 		return station;
 	}
 
-
 	/**
 	 * @return the stationId
 	 */
 	public int getStationId() {
 		return stationId;
 	}
-
 
 	/**
 	 * @return the timeString
@@ -78,7 +75,6 @@ public class Route {
 		return timeString;
 	}
 
-
 	/**
 	 * @return the time
 	 */
@@ -86,14 +82,12 @@ public class Route {
 		return time;
 	}
 
-
 	/**
 	 * @return the day
 	 */
 	public int getDay() {
 		return day;
 	}
-
 
 	/**
 	 * @return the rowNum

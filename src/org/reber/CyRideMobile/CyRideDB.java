@@ -44,27 +44,64 @@ public class CyRideDB
 
 	private DatabaseHelper dbHelper;
 
+	/**
+	 * Creates and opens a CyRideDB with the given Context.
+	 * 
+	 * @param ctx
+	 */
 	public CyRideDB(Context ctx) {
 		this.context = ctx;
 		open();
 	}
 
+	/**
+	 * Opens the database. 
+	 */
 	public void open() {
 		dbHelper = new DatabaseHelper(context);
 	}
 
+	/**
+	 * Closes the database.
+	 */
 	public void close() {
 		dbHelper.close();
 	}
 
-	public void setDayOfWeek(int dOW) {
-		this.dayOfWeek = dOW;
+	/**
+	 * Sets the day of the week to use in the SQL queries.
+	 * 
+	 * @param dayOfWeek
+	 * 0 = Weekday <br />
+	 * 1 = Saturday <br />
+	 * 2 = Sunday <br />
+	 */
+	public void setDayOfWeek(int dayOfWeek) {
+		this.dayOfWeek = dayOfWeek;
 	}
 
+	/**
+	 * Gets the day of the week
+	 * 
+	 * @return the day of the week
+	 */
 	public int getDayOfWeek() {
 		return this.dayOfWeek;
 	}
 
+	/**
+	 * Inserts a Route in the database with the given parameters.
+	 * If possible, use insertRoute(List&lt;Route&gt; routes).
+	 * 
+	 * @param routeId
+	 * @param routeName
+	 * @param station
+	 * @param stationId
+	 * @param timeString
+	 * @param time
+	 * @param dayOfWeek
+	 * @param rowNum
+	 */
 	public void insertRoute(int routeId, String routeName, String station, int stationId, String timeString,
 			int time, int dayOfWeek, int rowNum) {
 		SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -83,8 +120,15 @@ public class CyRideDB
 			db.close();
 		}
 	}
-	
 
+	/**
+	 * Inserts all the Routes in a List into the database.
+	 * This makes a batch call into the database, which is much quicker than single calls.
+	 * This method is preferred.
+	 * 
+	 * @param routes
+	 * A List of Route objects
+	 */
 	public void insertRoute(List<Route> routes) {
 		SQLiteDatabase db = dbHelper.getWritableDatabase();
 		try{
@@ -108,7 +152,13 @@ public class CyRideDB
 			db.close();
 		}
 	}
-	
+
+	/**
+	 * Gets all the Route objects in the database.
+	 * 
+	 * @return
+	 * All Route rows in the table
+	 */
 	public Cursor getAllRoutes() {
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
 		Cursor c = null;
@@ -122,6 +172,9 @@ public class CyRideDB
 		return c;
 	}
 
+	/**
+	 * Deletes all rows from the table
+	 */
 	public void deleteAllRoutes() {
 		SQLiteDatabase db = dbHelper.getWritableDatabase();
 		try {
@@ -132,13 +185,18 @@ public class CyRideDB
 		}
 	}
 
+	/**
+	 * Gets the number of rows in the table
+	 * 
+	 * @return
+	 * The number of rows in the table
+	 */
 	public int getCountRoute() {
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
 		Cursor c = null;
 		int temp;
 		try {
 			String subquery = "SELECT " + KEY_STATIONNAME + " FROM " + DATABASE_TABLE;
-			Log.d("QUERY", subquery);
 			c = db.rawQuery(subquery, null);
 			temp = c.getCount();
 		} finally {
@@ -147,7 +205,15 @@ public class CyRideDB
 		}
 		return temp;
 	}
-	
+
+	/**
+	 * Gets the name of a route by its id.
+	 * 
+	 * @param id
+	 * The id of the route
+	 * @return
+	 * The name of the route with the given id
+	 */
 	public String getNameOfRouteById(int id) {
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
 		Cursor c = null;
@@ -155,7 +221,6 @@ public class CyRideDB
 		try {
 			String subquery = "SELECT DISTINCT " + KEY_ROUTENAME + " FROM " + DATABASE_TABLE + " WHERE " + 
 			KEY_DAY + " = " + dayOfWeek + " AND " + KEY_ROUTEID + " = " + id;
-			Log.d("QUERY", subquery);
 			c = db.rawQuery(subquery, null);
 			c.moveToFirst();
 			if (c.getCount() > 1)
@@ -167,15 +232,19 @@ public class CyRideDB
 		return name;
 	}
 
+	/**
+	 * Gets the names of the Routes for the currently set day
+	 * 
+	 * @return
+	 * A List of route names
+	 */
 	public List<NameIdWrapper> getRouteNames() {
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
-		Log.d("DB",db.getPath());
 		List<NameIdWrapper> list = new ArrayList<NameIdWrapper>();
 		Cursor c = null;
 		try {
 			String subquery = "SELECT DISTINCT " + KEY_ROUTENAME + ", " + KEY_ROUTEID + " FROM " + DATABASE_TABLE + " WHERE " + KEY_DAY + " = " + dayOfWeek
-			 + " ORDER BY " + KEY_ROUTEID;
-			Log.d("QUERY", subquery);
+			+ " ORDER BY " + KEY_ROUTEID;
 			c = db.rawQuery(subquery, null);
 			Log.d("SIZE", c.getCount()+"");
 			if (c.getCount() > 1) {
@@ -194,6 +263,12 @@ public class CyRideDB
 		return list;
 	}
 
+	/**
+	 * Gets the names of the stations for the currently set day and given routeId
+	 * 
+	 * @return
+	 * A List of station names for the given routeId
+	 */
 	public List<NameIdWrapper> getStationNamesForRoute(int routeId) {
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
 		List<NameIdWrapper> list = new ArrayList<NameIdWrapper>();
@@ -201,7 +276,6 @@ public class CyRideDB
 		try {
 			String subquery = "SELECT DISTINCT " + KEY_STATIONNAME + ", " + KEY_STATIONID + " FROM " + DATABASE_TABLE + 
 			" WHERE " + KEY_DAY + " = " + dayOfWeek + " AND " + KEY_ROUTEID + " = " + routeId + " ORDER BY " + KEY_STATIONID;
-			Log.d("QUERY", subquery);
 			c = db.rawQuery(subquery, null);
 			if (c.getCount() > 1) {
 				do {
@@ -219,14 +293,19 @@ public class CyRideDB
 		return list;
 	}
 
-	public List<String> getTimesForRouteAndStation(int routeId, int stationId) {
+	/**
+	 * Gets the times for the given station for the currently set day
+	 * 
+	 * @return
+	 * A List of times for the given station
+	 */
+	public List<String> getTimesForStation(int routeId, int stationId) {
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
 		List<String> list = new ArrayList<String>();
 		Cursor c = null;
 		try {
 			String subquery = "SELECT " + KEY_TIMESTRING + " FROM " + DATABASE_TABLE + " WHERE " + KEY_DAY + " = " + dayOfWeek + 
 			" AND " + KEY_ROUTEID + " = " + routeId + " AND " + KEY_STATIONID + " = " + stationId + " ORDER BY " + KEY_TIME;
-			Log.d("QUERY", subquery);
 			c = db.rawQuery(subquery, null);
 			if (c.getCount() > 1) {
 				do {
@@ -242,16 +321,25 @@ public class CyRideDB
 
 		return list;
 	}
-	
+
+	/**
+	 * A helper class for interacting with the Database
+	 * 
+	 * @author brianreber
+	 */
 	private static class DatabaseHelper extends SQLiteOpenHelper 
 	{
+		/**
+		 * Creates a new Database with the given context
+		 * 
+		 * @param context
+		 */
 		DatabaseHelper(Context context) {
 			super(context, DATABASE_NAME, null, DATABASE_VERSION);
 		}
 
 		@Override
 		public void onCreate(SQLiteDatabase db) {
-			Log.w(TAG, "Create DB");
 			db.execSQL(DATABASE_CREATE);
 		}
 
