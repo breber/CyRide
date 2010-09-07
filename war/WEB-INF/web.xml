@@ -28,6 +28,14 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 		<servlet-name>GetDataFromURL</servlet-name>
 		<url-pattern>/GetDataFromURL</url-pattern>
 	</servlet-mapping>
+	<servlet>
+		<servlet-name>DeleteAll</servlet-name>
+		<servlet-class>org.reber.Cyride.DeleteAll</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>DeleteAll</servlet-name>
+		<url-pattern>/DeleteAll</url-pattern>
+	</servlet-mapping>
 	<welcome-file-list>
 		<welcome-file>routes.jsp</welcome-file>
 	</welcome-file-list>

@@ -142,14 +142,6 @@ public class GetDataFromURL extends HttpServlet {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 
 		try {
-//			Query q = pm.newQuery(Route.class);
-//			q.setFilter("routeId == 11");
-//			q.setFilter("day == 1");
-//			try {
-//				q.deletePersistentAll();
-//			} catch (DeadlineExceededException e) {
-//				q.deletePersistentAll();
-//			}
 //			if (addToDB != null) {
 				for (Route r : routes) {
 					pm.makePersistent(r);
