@@ -9,14 +9,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -293,19 +296,17 @@ public class CyRideActivity extends Activity {
 			public void run() {
 				try {
 					db.deleteAllRoutes();
-					db.open();
 					json = new JSONObject(getData());
+					addRecords();
+					json = null;
 					handler.post(new Runnable() {
 						@Override
 						public void run() {
 							try {
-								addRecords();
-								json = null;
 								if (loadView) {
 									createList(-1, -1);
 								}
-							} catch (JSONException e) {	} 
-							finally {
+							} finally {
 								prompt.dismiss();
 							}
 						}
@@ -324,27 +325,69 @@ public class CyRideActivity extends Activity {
 	private String getData() throws MalformedURLException, IOException {
 		String urlStr = "http://cyridesql.appspot.com/getroutes";
 
-		URL url = new URL(urlStr);
-		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-		BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-		StringBuilder sb = new StringBuilder();
-		int temp = reader.read();
-
-		while (temp != -1) {
-			sb.append(temp);
-			temp = reader.read();
+		HttpClient httpclient = new DefaultHttpClient();
+		 
+        // Prepare a request object
+        HttpGet httpget = new HttpGet(urlStr);
+        
+        HttpResponse response;
+        try {
+            response = httpclient.execute(httpget);
+            // Examine the response status
+            Log.i("Praeda",response.getStatusLine().toString());
+ 
+            // Get hold of the response entity
+            HttpEntity entity = response.getEntity();
+            // If the response does not enclose an entity, there is no need
+            // to worry about connection release
+ 
+            if (entity != null) {
+                InputStream instream = entity.getContent();
+                return convertStreamToString(instream);
+            }
+        } catch (IOException e) {
+        	
 		}
-
-		return sb.toString();
+		return null;
 	}
+	
+	private static String convertStreamToString(InputStream is) {
+        /*
+         * To convert the InputStream to String we use the BufferedReader.readLine()
+         * method. We iterate until the BufferedReader return null which means
+         * there's no more data to read. Each line will appended to a StringBuilder
+         * and returned as String.
+         */
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        StringBuilder sb = new StringBuilder();
+ 
+        String line = null;
+        try {
+            while ((line = reader.readLine()) != null) {
+                sb.append(line + "\n");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                is.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return sb.toString();
+    }
 
 	private void addRecords() throws JSONException {
 		JSONArray array = json.getJSONArray("records");
+		List<Route> routes = new ArrayList<Route>();
 		for (int i = 0; i < array.length(); i++) {
 			JSONObject obj = array.getJSONObject(i);
-			db.insertRoute(obj.getInt("routeid"), obj.getString("routename"), obj.getString("station"), obj.getInt("stationid"), 
-					obj.getString("timestring"), obj.getInt("time"), obj.getInt("dayofweek"), obj.getInt("rownum"));
+			routes.add(new Route(obj.getString("routename"), obj.getInt("routeid"), obj.getString("station"), obj.getInt("stationid"), 
+					obj.getString("timestring"), obj.getInt("time"), obj.getInt("dayofweek"), obj.getInt("rownum")));
 		}
+		
+		db.insertRoute(routes);
 	}
 	
 	private void exportDB() {

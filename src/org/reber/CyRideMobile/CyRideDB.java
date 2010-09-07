@@ -83,7 +83,32 @@ public class CyRideDB
 			db.close();
 		}
 	}
+	
 
+	public void insertRoute(List<Route> routes) {
+		SQLiteDatabase db = dbHelper.getWritableDatabase();
+		try{
+			db.beginTransaction();
+			for (Route r : routes) {
+
+				ContentValues initialValues = new ContentValues();
+				initialValues.put(KEY_ROUTEID, r.getRouteId());
+				initialValues.put(KEY_ROUTENAME, r.getRouteName());
+				initialValues.put(KEY_STATIONNAME, r.getStation());
+				initialValues.put(KEY_STATIONID, r.getStationId());
+				initialValues.put(KEY_TIMESTRING, r.getTimeString());
+				initialValues.put(KEY_TIME, r.getTime());
+				initialValues.put(KEY_DAY, r.getDay());
+				initialValues.put(KEY_ROWNUM, r.getRowNum());
+				db.insert(DATABASE_TABLE, null, initialValues);
+			}
+			db.setTransactionSuccessful();
+		} finally {
+			db.endTransaction();
+			db.close();
+		}
+	}
+	
 	public Cursor getAllRoutes() {
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
 		Cursor c = null;
@@ -101,6 +126,7 @@ public class CyRideDB
 		SQLiteDatabase db = dbHelper.getWritableDatabase();
 		try {
 			db.execSQL("DROP TABLE " + DATABASE_TABLE);
+			db.execSQL(DATABASE_CREATE);
 		} finally {
 			db.close();
 		}
@@ -225,6 +251,7 @@ public class CyRideDB
 
 		@Override
 		public void onCreate(SQLiteDatabase db) {
+			Log.w(TAG, "Create DB");
 			db.execSQL(DATABASE_CREATE);
 		}
 
