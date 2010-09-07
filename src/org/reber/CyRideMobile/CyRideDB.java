@@ -28,7 +28,7 @@ public class CyRideDB
 	public static final String KEY_ROWNUM = "rownum";
 	private static final String TAG = "DBAdapter";
 
-	private static final String DATABASE_NAME = "CyRide";
+	private static final String DATABASE_NAME = "cyride.db";
 	private static final String DATABASE_TABLE = "cyride";
 	private static final int DATABASE_VERSION = 1;
 
@@ -152,6 +152,7 @@ public class CyRideDB
 	public List<NameIdWrapper> getRouteNames() 
 	{
 		SQLiteDatabase db = DBHelper.getReadableDatabase();
+		Log.d("DB",db.getPath());
 		List<NameIdWrapper> list = new ArrayList<NameIdWrapper>();
 		Cursor c = null;
 		try {
