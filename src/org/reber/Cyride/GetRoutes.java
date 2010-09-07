@@ -15,23 +15,26 @@ public class GetRoutes extends HttpServlet {
 	public void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException {
 		resp.setContentType("application/json");
+		resp.setCharacterEncoding("UTF-8");
 		PrintWriter out = resp.getWriter();
 		
 		PersistenceManager pm = PMF.get().getPersistenceManager();
+		
+		StringBuilder sb = new StringBuilder();
 		try {
 				List<Route> records = (List<Route>)pm.newQuery(Route.class).execute();
-				out.println("{");
-				out.println("\"count\":"+records.size()+",");
-				out.println("\"records\":[");
+				sb.append("{");
+				sb.append("\"count\":"+records.size()+",");
+				sb.append("\"records\":[");
 				for (int i = 0; i < records.size(); i++)
 				{
 					Route r = records.get(i);
-					out.print(r);
-					if (i != records.size() - 1) out.println(",");
-					else out.println();
+					sb.append(r);
+					if (i != records.size() - 1) sb.append(",");
 				}
-				out.println("]}");
+				sb.append("]}");
 		} finally {
+			out.print(sb.toString());
 			pm.close();
 		}
 	}

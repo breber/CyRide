@@ -120,7 +120,7 @@ public class GetDataFromURL extends HttpServlet {
 						isMorning = false;
 					int routeId = (emptyLocation == 0) ? lists.indexOf(l) : (1 + lists.indexOf(l));
 					Route r = new Route(route, getRouteId(route), name, routeId, s, convertTimeStringToMinute(s.substring(0, s.indexOf(":")), 
-							s.substring(s.indexOf(":")+1), isMorning), getDayOfWeek(dayOfWeek), j, "");
+							s.substring(s.indexOf(":")+1), isMorning), getDayOfWeek(dayOfWeek), j);
 					previousTime = convertTimeStringToMinute(s.substring(0, s.indexOf(":")), 
 							s.substring(s.indexOf(":")+1), isMorning);
 					routes.add(r);
