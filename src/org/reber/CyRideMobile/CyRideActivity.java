@@ -2,6 +2,7 @@ package org.reber.CyRideMobile;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -11,6 +12,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -118,8 +120,7 @@ public class CyRideActivity extends Activity {
 			createList(-1, -1);
 		} else {
 			status = ListViewStatus.ROUTE;
-//			getDataProcess(true);
-			new ExportDatabaseFileTask().execute();
+			new ImportDatabaseFileTask().execute();
 		}
 	}
 
@@ -235,7 +236,7 @@ public class CyRideActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		String menuTitle = item.getTitle().toString();
 
-		if (menuTitle.equals("Get Data")) {
+		if (menuTitle.equals("Update Data From Server")) {
 			getDataProcess(true);
 		}
 		if (menuTitle.equals("Count SQL Records")) {
@@ -243,6 +244,9 @@ public class CyRideActivity extends Activity {
 			d.setCancelable(true);
 			d.setTitle(getCount()+"");
 			d.show();
+		}
+		if (menuTitle.equals("Export DB")) {
+			exportDB();
 		}
 		if (menuTitle.equals("Open DB")) {
 			db.open();
@@ -280,14 +284,16 @@ public class CyRideActivity extends Activity {
 	}
 
 	private void getDataProcess(final boolean loadView) {
-		final Dialog prompt = new ProgressDialog(this);
-		prompt.setTitle("Loading...");
+		final ProgressDialog prompt = new ProgressDialog(this);
+		prompt.setMessage("Loading...");
 
 		final Handler handler = new Handler();
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
 				try {
+					db.deleteAllRoutes();
+					db.open();
 					json = new JSONObject(getData());
 					handler.post(new Runnable() {
 						@Override
@@ -339,6 +345,10 @@ public class CyRideActivity extends Activity {
 			db.insertRoute(obj.getInt("routeid"), obj.getString("routename"), obj.getString("station"), obj.getInt("stationid"), 
 					obj.getString("timestring"), obj.getInt("time"), obj.getInt("dayofweek"), obj.getInt("rownum"));
 		}
+	}
+	
+	private void exportDB() {
+		new ExportDatabaseFileTask().execute();
 	}
 
 	private class CyRideListAdapter extends ArrayAdapter<String> {
@@ -407,8 +417,8 @@ public class CyRideActivity extends Activity {
 			return v;
 		}
 	}
-
-	private class ExportDatabaseFileTask extends AsyncTask<String, Void, Boolean> {
+	
+	private class ImportDatabaseFileTask extends AsyncTask<String, Void, Boolean> {
 		private final ProgressDialog dialog = new ProgressDialog(CyRideActivity.this);
 
 		// can use UI thread here
@@ -452,4 +462,62 @@ public class CyRideActivity extends Activity {
 			}
 		}
 	}
+
+	private class ExportDatabaseFileTask extends AsyncTask<String, Void, Boolean> {
+		private final ProgressDialog dialog = new ProgressDialog(CyRideActivity.this);
+
+		// can use UI thread here
+		protected void onPreExecute() {
+			this.dialog.setMessage("Exporting database...");
+			this.dialog.show();
+		}
+
+		// automatically done on worker thread (separate from UI thread)
+		protected Boolean doInBackground(final String... args) {
+
+			File dbFile =
+				new File(Environment.getDataDirectory() + "/data/org.reber.CyRideMobile/databases/cyride.db");
+
+			File exportDir = new File(Environment.getExternalStorageDirectory(), "cyride.db");
+			if (!exportDir.exists()) {
+				exportDir.mkdirs();
+			}
+			File file = new File(exportDir, dbFile.getName());
+
+			try {
+				file.createNewFile();
+				this.copyFile(dbFile, file);
+				return true;
+			} catch (IOException e) {
+				return false;
+			}
+		}
+
+		// can use UI thread here
+		protected void onPostExecute(final Boolean success) {
+			if (this.dialog.isShowing()) {
+				this.dialog.dismiss();
+			}
+			if (success) {
+				Toast.makeText(CyRideActivity.this, "Export successful!", Toast.LENGTH_SHORT).show();
+			} else {
+				Toast.makeText(CyRideActivity.this, "Export failed", Toast.LENGTH_SHORT).show();
+			}
+		}
+
+		void copyFile(File src, File dst) throws IOException {
+			FileChannel inChannel = new FileInputStream(src).getChannel();
+			FileChannel outChannel = new FileOutputStream(dst).getChannel();
+			try {
+				inChannel.transferTo(0, inChannel.size(), outChannel);
+			} finally {
+				if (inChannel != null)
+					inChannel.close();
+				if (outChannel != null)
+					outChannel.close();
+			}
+		}
+
+	}
+
 }
