@@ -521,7 +521,7 @@ public class CyRideActivity extends Activity {
 			File dbFile =
 				new File(Environment.getDataDirectory() + "/data/org.reber.CyRideMobile/databases/cyride.db");
 
-			File exportDir = new File(Environment.getExternalStorageDirectory(), "cyride.db");
+			File exportDir = new File(Environment.getExternalStorageDirectory(), "cyride");
 			if (!exportDir.exists()) {
 				exportDir.mkdirs();
 			}
