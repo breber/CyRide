@@ -20,21 +20,19 @@ public class GetRoutes extends HttpServlet {
 		
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		
-		StringBuilder sb = new StringBuilder();
 		try {
 				List<Route> records = (List<Route>)pm.newQuery(Route.class).execute();
-				sb.append("{");
-				sb.append("\"count\":"+records.size()+",");
-				sb.append("\"records\":[");
+				out.println("{");
+				out.println("\"count\":"+records.size()+",");
+				out.println("\"records\":[");
 				for (int i = 0; i < records.size(); i++)
 				{
 					Route r = records.get(i);
-					sb.append(r);
-					if (i != records.size() - 1) sb.append(",");
+					out.println(r);
+					if (i != records.size() - 1) out.println(",");
 				}
-				sb.append("]}");
+				out.println("]}");
 		} finally {
-			out.print(sb.toString());
 			pm.close();
 		}
 	}

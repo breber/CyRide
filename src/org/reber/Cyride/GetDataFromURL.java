@@ -20,6 +20,7 @@ public class GetDataFromURL extends HttpServlet {
 		String route = "", dayOfWeek = "";
 		
 		String urlString = req.getParameter("url").replaceAll("AND", "&");
+//		String addToDB = req.getParameter("add");
 		URL url = new URL(urlString);
 		Scanner scan = new Scanner(url.openConnection().getInputStream());
 		String temp = "";
@@ -144,10 +145,16 @@ public class GetDataFromURL extends HttpServlet {
 //			Query q = pm.newQuery(Route.class);
 //			q.setFilter("routeId == 11");
 //			q.setFilter("day == 1");
-//			q.deletePersistentAll();
-			for (Route r : routes) {
-				pm.makePersistent(r);
-			}
+//			try {
+//				q.deletePersistentAll();
+//			} catch (DeadlineExceededException e) {
+//				q.deletePersistentAll();
+//			}
+//			if (addToDB != null) {
+				for (Route r : routes) {
+					pm.makePersistent(r);
+				}
+//			}
 		} finally {
 			pm.close();
 		}
@@ -173,11 +180,11 @@ public class GetDataFromURL extends HttpServlet {
 		if (name.contains("2") && name.contains("East")) return 3;
 		if (name.contains("3") && name.contains("South")) return 4;
 		if (name.contains("3") && name.contains("North")) return 5;
-		if (name.contains("6B") || (name.contains("6") && name.contains("Brown") && name.contains("South"))) return 6;
-		if (name.contains("6A") && name.contains("Towers")) return 7;
-		if (name.contains("5") && name.contains("Yellow")) return 8;
-		if (name.contains("4") && name.contains("Gray")) return 9;
-		if (name.contains("6") && name.contains("Brown") && name.contains("North")) return 10;
+		if (name.contains("4") && name.contains("Gray")) return 6;
+		if (name.contains("5") && name.contains("Yellow")) return 7;
+		if (name.contains("6") && name.contains("Brown") && name.contains("North")) return 8;
+		if (name.contains("6A") && name.contains("Towers")) return 9;
+		if (name.contains("6B") || (name.contains("6") && name.contains("Brown") && name.contains("South"))) return 10;
 		if (name.contains("7") && name.contains("Purple")) return 11;
 		if (name.contains("10") && name.contains("Pink")) return 12;
 		if (name.contains("21") && name.contains("Cardinal")) return 13;
