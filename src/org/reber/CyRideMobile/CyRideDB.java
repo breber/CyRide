@@ -305,7 +305,7 @@ public class CyRideDB
 		Cursor c = null;
 		try {
 			String subquery = "SELECT " + KEY_TIMESTRING + " FROM " + DATABASE_TABLE + " WHERE " + KEY_DAY + " = " + dayOfWeek + 
-			" AND " + KEY_ROUTEID + " = " + routeId + " AND " + KEY_STATIONID + " = " + stationId + " ORDER BY " + KEY_TIME;
+			" AND " + KEY_ROUTEID + " = " + routeId + " AND " + KEY_STATIONID + " = " + stationId + " ORDER BY " + KEY_ROWNUM;
 			c = db.rawQuery(subquery, null);
 			if (c.getCount() > 1) {
 				do {
