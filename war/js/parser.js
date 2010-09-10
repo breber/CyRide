@@ -3,7 +3,7 @@ $().ready(function() {
 		var elems = document.getElementsByTagName("input");
 		$.each(elems, function() {
 			if (this.checked) {
-				$.ajax({url:"/GetDataFromURL?url="+this.value.replace('&', 'AND'), async: false});
+				$.ajax({url:"/GetDataFromURL?url="+this.value.replace('&', 'AND').replace('AMP', '&'), async: false});
 			}
 		})
 	});

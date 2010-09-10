@@ -24,15 +24,15 @@ cyride.web.getItemsByDate = function() {
 };
 cyride.web.getItemsByRoute = function(search) {
 	var day = document.getElementById('day').selectedIndex;
-	cyride.web.db.transaction(function(tx) { tx.executeSql('SELECT * FROM cyride WHERE routeid = \''+search+'\' AND dayofweek = \''+day+'\' ORDER BY routeid, stationid, time', [], cyride.web.fillInStations, cyride.web.onError);	});
+	cyride.web.db.transaction(function(tx) { tx.executeSql('SELECT * FROM cyride WHERE routeid = \''+search+'\' AND dayofweek = \''+day+'\' ORDER BY routeid, stationid, rownum', [], cyride.web.fillInStations, cyride.web.onError);	});
 };
 cyride.web.getItemsByRowNum = function(routeid, rownum) {
 	var day = document.getElementById('day').selectedIndex;
-	cyride.web.db.transaction(function(tx) { tx.executeSql('SELECT * FROM cyride WHERE routeid = \''+routeid+'\' AND rownum = \''+rownum+'\' AND dayofweek = \''+day+'\' ORDER BY routeid, stationid, time', [], cyride.web.loadRecordItemsRowNum, cyride.web.onError);	});
+	cyride.web.db.transaction(function(tx) { tx.executeSql('SELECT * FROM cyride WHERE routeid = \''+routeid+'\' AND rownum = \''+rownum+'\' AND dayofweek = \''+day+'\' ORDER BY routeid, stationid, rownum', [], cyride.web.loadRecordItemsRowNum, cyride.web.onError);	});
 };
 cyride.web.getItemsByRouteAndStation = function(search) {
 	var day = document.getElementById('day').selectedIndex;
-	cyride.web.db.transaction(function(tx) { tx.executeSql('SELECT * FROM cyride WHERE routeid = \''+search.route+'\' AND stationid = \''+search.station+'\' AND dayofweek = \''+day+'\'  ORDER BY routeid, stationid, time', [], cyride.web.loadRecordItems, cyride.web.onError);	});
+	cyride.web.db.transaction(function(tx) { tx.executeSql('SELECT * FROM cyride WHERE routeid = \''+search.route+'\' AND stationid = \''+search.station+'\' AND dayofweek = \''+day+'\'  ORDER BY routeid, stationid, rownum', [], cyride.web.loadRecordItems, cyride.web.onError);	});
 };
 cyride.web.getAllItems = function() {
 	cyride.web.db.transaction(function(tx) { tx.executeSql('SELECT * FROM cyride ORDER BY routeid, stationid, time', [], cyride.web.loadRecordItems, cyride.web.onError);	});
@@ -93,8 +93,8 @@ cyride.web.fillInStations = function(tx,rs) {
 	var stationIds = [];
 	var stationsCount = 0;
 	for (var i = 0; i < rs.rows.length; i++) {
-		var temp = rs.rows.item(i).station;
-		if (!stationNames.contains(temp)) {
+		var temp = rs.rows.item(i).stationid;
+		if (!stationIds.contains(temp)) {
 			stationNames[stationsCount] = rs.rows.item(i).station;
 			stationIds[stationsCount] = rs.rows.item(i).stationid;
 			stationsCount++;
@@ -164,15 +164,15 @@ window.onload = function() {
 			$("#route").change(function(){
 				$("#station-wrapper").hide();
 				$("#table").hide();
-				cyride.web.getItemsByRoute(this.value.substring(0,1));
+				cyride.web.getItemsByRoute(this.options[this.selectedIndex].id.substring(5));
 			});
 			$("#station").change(function(){
 				if (this.selectedIndex === 0) {
 					$("#table").hide();
 				} else {
 					var obj = {};
-					obj.route = $("#route").val().substring(0,1);
-					obj.station = this.value.substring(0,1);
+					obj.route = document.getElementById("route").options[document.getElementById("route").selectedIndex].id.substring(5);
+					obj.station = this.value.substring(0,3);
 					cyride.web.getItemsByRouteAndStation(obj);
 
 					$("#table").show();

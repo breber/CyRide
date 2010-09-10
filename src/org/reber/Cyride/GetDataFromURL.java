@@ -6,21 +6,23 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import javax.jdo.PersistenceManager;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @SuppressWarnings("serial")
 public class GetDataFromURL extends HttpServlet {
+	
+	private String[] timesOfDay = {"12", "1", "2", "3", "4", "5", "6", "7", "8", "9","10", "11", "12", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"};
+	
 	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 		resp.setContentType("application/xml");
 		PrintWriter out = resp.getWriter();
 		
-		String route = "", dayOfWeek = "";
+		String doNotPersist = req.getParameter("nopersist");
 		
 		String urlString = req.getParameter("url").replaceAll("AND", "&");
-//		String addToDB = req.getParameter("add");
+
 		URL url = new URL(urlString);
 		Scanner scan = new Scanner(url.openConnection().getInputStream());
 		String temp = "";
@@ -46,15 +48,19 @@ public class GetDataFromURL extends HttpServlet {
 		temp = temp.replaceAll("</td><tr>", "</td></tr><tr>");
 		temp = temp.replaceAll(">\\s+<","><");
 		
+		temp = temp.replaceAll("[^\\s]\\s+<","<");
+		
 		temp = temp.replaceFirst("<tr><td>(.+?)\\s([^\\s]+?)</td></tr>", "<route>$1</route><dayOfWeek>$2</dayOfWeek>");
-
+//		out.println(temp);
+		
 		temp = temp.replaceFirst("<tr>(.+?)</tr>", "");
+
+		if (temp.substring(temp.indexOf("<tr>"), temp.indexOf("</tr>")+5).matches("<tr><td>.+?\\d\\d\\d\\d\\sto\\s.+?</td></tr>"))
+			temp = temp.replaceFirst("<tr>(.+?)</tr>", "");
+		
 		temp = temp.replaceFirst("<tr>(.+?)</tr>", "<stations>$1</stations>");
 		temp = temp.replaceAll("<tr>(<td>\\s*</td>)+</tr>", "");
-		
-		route = temp.substring(temp.indexOf("<route>") + 7, temp.indexOf("</route>")).trim();
-		dayOfWeek = temp.substring(temp.indexOf("<dayOfWeek>") + 11, temp.indexOf("</dayOfWeek>"));
-		
+
 		int emptyLocation = -1;
 		
 		String stationsNode = temp.substring(temp.indexOf("<stations>"), temp.indexOf("</stations>")+11);
@@ -83,107 +89,81 @@ public class GetDataFromURL extends HttpServlet {
 		temp = temp.replaceAll("<tr>.+?All trips have.+?</tr>", "");
 		temp = temp.replaceAll("<tr>.+?Shaded lines.+?</tr>\\s+?<tr>.+?</tr>", "");
 		temp = temp.replaceAll("<tr>.+?Continues.+?</tr>", "");
+		
 
 		String[] array = temp.substring(temp.indexOf("<tr>")).split("</tr>");
 		for (int j = 0; j < array.length; j++) {
 			String t = array[j];
+
 			String[] tdArray = t.split("</td>");
 			for (int i = 0; i < stations.size(); i++) {
 				if (i != emptyLocation) {
 					try {
 						if (tdArray[i].substring(tdArray[i].indexOf("<td>")+4).trim().matches("^\\d?\\d:\\d\\d$")) {
 							lists.get(i).add(tdArray[i].substring(tdArray[i].indexOf("<td>")+4).trim());
-						} /*else if (tdArray[i].contains("+") || tdArray[i].contains("Request")) {
+						} else if (tdArray[i].contains("+") || tdArray[i].contains("Request")) {
 							lists.get(i).add(tdArray[i].substring(tdArray[i].indexOf("<td>")+4).trim());
-						} */else {
+						} else if (tdArray[i].contains("The lines below operate") || tdArray[i].contains("The following lines operate")) {
+							for (int k = i; k < stations.size(); k++) {
+								lists.get(k).add(tdArray[i].substring(tdArray[i].indexOf("<td>")+4).trim());
+							}
+						} else {
 							lists.get(i).add("---");
 						}
 					} catch (IndexOutOfBoundsException e){lists.get(i).add("---");}
 				}
 			}
 		}
-
+		
 		StringBuilder sb = new StringBuilder(temp.substring(0, temp.indexOf("</stations>")+11));
-		ArrayList<Route> routes = new ArrayList<Route>();
 		for (int i = 0; i < lists.size(); i++) {
 			ArrayList<String> l = lists.get(i);
 			sb.append("<station>");
 			sb.append("<name>"+stations.get(lists.indexOf(l))+"</name>");
-			String name = stations.get(lists.indexOf(l));
-			int previousTime = 0;
+			
+			int tempIndex = 0;
 			for (int j = 0; j < l.size(); j++) {
 				String str = l.get(j);
 				String s = str.replaceAll("<td>", "").replaceAll("\\s+"," ").trim();
-				boolean isMorning = true;
+
 				if (s.contains(":")) {
-					if (previousTime > convertTimeStringToMinute(s.substring(0, s.indexOf(":")), 
-							s.substring(s.indexOf(":")+1), isMorning))
-						isMorning = false;
-					int routeId = (emptyLocation == 0) ? lists.indexOf(l) : (1 + lists.indexOf(l));
-					Route r = new Route(route, getRouteId(route), name, routeId, s, convertTimeStringToMinute(s.substring(0, s.indexOf(":")), 
-							s.substring(s.indexOf(":")+1), isMorning), getDayOfWeek(dayOfWeek), j);
-					previousTime = convertTimeStringToMinute(s.substring(0, s.indexOf(":")), 
-							s.substring(s.indexOf(":")+1), isMorning);
-					routes.add(r);
-				} /*else if (s.contains("+") || s.contains("Request")) {
-					int routeId = (emptyLocation == 0) ? lists.indexOf(l) : (1 + lists.indexOf(l));
-					Route r = new Route(route, getRouteId(route), name, routeId, s, previousTime + 1, getDayOfWeek(dayOfWeek), j, "");
-					previousTime++;
-					routes.add(r);
-				}*/
-				sb.append("<time><num>"+s+"</num><rownum>"+j+"</rownum></time>");
+					int copy = tempIndex;
+					tempIndex = figureOutIndex(s.substring(0, s.indexOf(":")), copy);
+					if (tempIndex != -1) {
+						boolean isMorning = (tempIndex < (timesOfDay.length / 2));
+
+						l.set(j, s + " " + (isMorning ? "AM":"PM"));
+						sb.append("<row><time>"+s+" " + (isMorning ? "AM":"PM") +"</time><rownum>"+j+"</rownum></row>"); 
+					} else {
+						tempIndex = copy;
+					}
+				} else if (!s.contains("---")) {
+					sb.append("<row><message>"+s+"</message><rownum>"+j+"</rownum></row>");
+				}
 			}
 			sb.append("</station>");
 		}
 		sb.append("</cyride>");
 		
 		out.println(sb.toString().replaceAll("<td>", "<station>").replaceAll("</td>", "</station>").replaceAll("\\s+", " "));
-
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-
-		try {
-//			if (addToDB != null) {
-				for (Route r : routes) {
-					pm.makePersistent(r);
-				}
-//			}
-		} finally {
-			pm.close();
-		}
-	}
-	
-	public static int getDayOfWeek(String day) {
-		if (day.contains("Sat")) return 1;
-		if (day.contains("Sun")) return 2;
-		else return 0;
-	}
-	
-	public static int convertTimeStringToMinute(String hour, String min, boolean isMorning) {
-		if (isMorning) {
-			return Integer.parseInt(hour.trim()) * 60 + Integer.parseInt(min.trim());
-		}
-		else return (Integer.parseInt(hour.trim()) + 12) * 60 + Integer.parseInt(min.trim());
-	}
-	
-	private static int getRouteId(String name) {
-		if (name.contains("1") && name.contains("West")) return 0;
-		if (name.contains("1") && name.contains("East")) return 1;
-		if (name.contains("2") && name.contains("West")) return 2;
-		if (name.contains("2") && name.contains("East")) return 3;
-		if (name.contains("3") && name.contains("South")) return 4;
-		if (name.contains("3") && name.contains("North")) return 5;
-		if (name.contains("4") && name.contains("Gray")) return 6;
-		if (name.contains("5") && name.contains("Yellow")) return 7;
-		if (name.contains("6") && name.contains("Brown") && name.contains("North")) return 8;
-		if (name.contains("6A") && name.contains("Towers")) return 9;
-		if (name.contains("6B") || (name.contains("6") && name.contains("Brown") && name.contains("South"))) return 10;
-		if (name.contains("7") && name.contains("Purple")) return 11;
-		if (name.contains("10") && name.contains("Pink")) return 12;
-		if (name.contains("21") && name.contains("Cardinal")) return 13;
-		if (name.contains("22") && name.contains("Gold")) return 14;
-		if (name.contains("23") && name.contains("Orange")) return 15;
-		if (name.contains("24") && name.contains("Silver")) return 16;
 		
-		else return -1;
+		if (doNotPersist == null) {
+			ParseDataFromXML.parseData(sb.toString().replaceAll("<td>", "<station>").replaceAll("</td>", "</station>").replaceAll("\\s+", " "));
+		}
+	}
+	
+	private int figureOutIndex(String input, int startingIndex) {
+		if (startingIndex >= 0 && startingIndex < timesOfDay.length) {
+			for (int i = startingIndex; i < timesOfDay.length; i++) {
+				if (timesOfDay[i].equals(input)) {
+					return i;
+				}
+			}
+		}
+		if (timesOfDay[0].equals(input)) {
+			return 0;
+		} else {
+			return -1;	
+		}
 	}
 }

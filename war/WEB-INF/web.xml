@@ -29,6 +29,14 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 		<url-pattern>/GetDataFromURL</url-pattern>
 	</servlet-mapping>
 	<servlet>
+		<servlet-name>ParseXML</servlet-name>
+		<servlet-class>org.reber.Cyride.ParseDataFromXML</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ParseXML</servlet-name>
+		<url-pattern>/parsexml</url-pattern>
+	</servlet-mapping>
+	<servlet>
 		<servlet-name>DeleteAll</servlet-name>
 		<servlet-class>org.reber.Cyride.DeleteAll</servlet-class>
 	</servlet>
