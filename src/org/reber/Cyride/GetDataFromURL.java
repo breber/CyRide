@@ -49,8 +49,11 @@ public class GetDataFromURL extends HttpServlet {
 		temp = temp.replaceAll(">\\s+<","><");
 		
 		temp = temp.replaceAll("[^\\s]\\s+<","<");
-		
+//		out.println(temp);
 		temp = temp.replaceFirst("<tr><td>(.+?)\\s([^\\s]+?)</td></tr>", "<route>$1</route><dayOfWeek>$2</dayOfWeek>");
+		
+		String routeAndDay = temp.substring(temp.indexOf("<route>") + 7, temp.indexOf("</dayOfWeek>") + 11);
+		temp = temp.replace(routeAndDay, routeAndDay.replaceAll("<td>|</td>", ""));
 //		out.println(temp);
 		
 		temp = temp.replaceFirst("<tr>(.+?)</tr>", "");
