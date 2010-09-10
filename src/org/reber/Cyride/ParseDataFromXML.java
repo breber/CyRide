@@ -37,8 +37,6 @@ public class ParseDataFromXML extends HttpServlet{
 		String route = input.substring(input.indexOf("<route>") + 7, input.indexOf("</route>"));
 		String dayOfWeek = input.substring(input.indexOf("<dayOfWeek>") + 11, input.indexOf("</dayOfWeek>"));
 		
-		List<String> stations = getStations(input.substring(input.indexOf("<stations>") + 10, input.indexOf("</stations>")));
-		
 		//Start after </stations>
 		String[] stationXml = input.substring(input.indexOf("</stations>")).split("</station>");
 		
@@ -83,18 +81,5 @@ public class ParseDataFromXML extends HttpServlet{
 		} finally {
 			pm.close();
 		}
-	}
-	
-	private static List<String> getStations(String xml) {
-		List<String> stations = new ArrayList<String>();
-		
-		String[] stationXml = xml.split("</station>");
-		
-		for (String s : stationXml) {
-			
-			stations.add(s.replaceAll("<.+?>", ""));
-		}
-		
-		return stations;
 	}
 }
