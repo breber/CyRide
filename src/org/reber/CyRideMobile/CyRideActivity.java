@@ -466,7 +466,7 @@ public class CyRideActivity extends Activity {
 					iv.setImageResource(R.drawable.blue);
 				} else if (temp.contains("Green")) {
 					iv.setImageResource(R.drawable.green);
-				} else if (temp.contains("Brown") || temp.contains("Towers")) {
+				} else if (temp.contains("Brown")) {
 					iv.setImageResource(R.drawable.brown);
 				} else if (temp.contains("Yellow")) {
 					iv.setImageResource(R.drawable.yellow);
@@ -476,6 +476,16 @@ public class CyRideActivity extends Activity {
 					iv.setImageResource(R.drawable.pink);
 				} else if (temp.contains("Purple")) {
 					iv.setImageResource(R.drawable.purple);
+				} else if (temp.contains("Towers")) {
+					iv.setImageResource(R.drawable.darkerbrown);
+				} else if (temp.contains("Silver")) {
+					iv.setImageResource(R.drawable.silver);
+				} else if (temp.contains("Gray")) {
+					iv.setImageResource(R.drawable.gray);
+				} else if (temp.contains("Cardinal")) {
+					iv.setImageResource(R.drawable.cardinal);
+				} else if (temp.contains("Gold")) {
+					iv.setImageResource(R.drawable.gold);
 				}
 			}
 			return v;
