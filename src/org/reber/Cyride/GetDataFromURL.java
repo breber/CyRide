@@ -103,7 +103,8 @@ public class GetDataFromURL extends HttpServlet {
 							lists.get(i).add(tdArray[i].substring(tdArray[i].indexOf("<td>")+4).trim());
 						} else if (tdArray[i].contains("+") || tdArray[i].contains("Request")) {
 							lists.get(i).add(tdArray[i].substring(tdArray[i].indexOf("<td>")+4).trim());
-						} else if (tdArray[i].contains("The lines below operate") || tdArray[i].contains("The following lines operate")) {
+						} else if (tdArray[i].contains("The lines below operate") || tdArray[i].contains("The following lines operate")
+								|| tdArray[i].contains("The following line operate")) {
 							for (int k = i; k < stations.size(); k++) {
 								if (k != emptyLocation) {
 									lists.get(k).add(tdArray[i].substring(tdArray[i].indexOf("<td>")+4).trim());
