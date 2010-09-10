@@ -14,13 +14,21 @@ $().ready(function() {
 				alert("Deleted");
 			});
 		});
+	$("button#getCount").click(function() {
+		$.get("/getcount", function(data) {
+				$("div#count").html(data);
+			});
+		});
 });
 
 </script>
 </head>
 
 <body>
+<button id="getCount">Get Count</button>
+<div id="count" style="display:inline; margin-left:1em"></div>
 
+<br /><br />
 <button id="delete">Delete</button>
 
 </body>
