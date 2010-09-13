@@ -210,14 +210,14 @@ public class CyRideActivity extends Activity {
 				list.add(listIds.get(i).getName());				
 			}
 		} else if (status == ListViewStatus.STATIONS && selectedRoute.getId() != -1) {
-			tv.setText(getDayOfWeek(db.getDayOfWeek()) + " - " + selectedRoute.getName());
+			tv.setText(getDayOfWeek(db.getDayOfWeek()) + " / " + selectedRoute.getName());
 			listIds = db.getStationNamesForRoute(selectedRoute.getId());
 			list = new ArrayList<String>();
 			for (int i = 0; i < listIds.size(); i++) {
 				list.add(listIds.get(i).getName());				
 			}
 		} else if (status == ListViewStatus.TIMES_FOR_STATION && selectedRoute.getId() != -1 && selectedStation.getId() != -1) {
-			tv.setText(getDayOfWeek(db.getDayOfWeek()) + " - " + selectedRoute.getName() + " - " + selectedStation.getName());
+			tv.setText(getDayOfWeek(db.getDayOfWeek()) + " / " + selectedRoute.getName() + " / " + selectedStation.getName());
 			list = db.getTimesForStation(selectedRoute.getId(), selectedStation.getId());
 		} else {
 			listIds = db.getRouteNames();
