@@ -16,12 +16,14 @@ import javax.servlet.http.HttpServletResponse;
 @SuppressWarnings("serial")
 public class GetCount extends HttpServlet {
 	
-	@SuppressWarnings("unchecked")
 	public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		
 		PrintWriter out = resp.getWriter();
 		
-		out.println(((List<Route>) pm.newQuery(Route.class).execute()).size());
+		@SuppressWarnings("unchecked")
+		Count count = ((List<Count>) pm.newQuery(Count.class).execute()).get(0);
+		
+		out.println(count.getCount());
 	}
 }

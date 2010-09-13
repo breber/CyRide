@@ -20,9 +20,10 @@ public class GetDataFromURL extends HttpServlet {
 		PrintWriter out = resp.getWriter();
 		
 		String doNotPersist = req.getParameter("nopersist");
+		String alreadyTransformed = req.getParameter("alreadytransformed");
 		
 		String urlString = req.getParameter("url").replaceAll("AND", "&");
-
+		
 		URL url = new URL(urlString);
 		Scanner scan = new Scanner(url.openConnection().getInputStream());
 		String temp = "";
@@ -31,6 +32,12 @@ public class GetDataFromURL extends HttpServlet {
 			temp1.append(scan.next() + " ");
 		}
 		temp = temp1.toString();
+		
+		if (doNotPersist == null && alreadyTransformed != null) {
+			ParseDataFromXML.parseData(temp.replaceAll("\\s+", " "));
+			return;
+		}
+		
 		temp = temp.substring(temp.indexOf("<table"),temp.indexOf("</table>")+8);
 		
 		temp = temp.replaceAll("<table.+?>", "<cyride>");

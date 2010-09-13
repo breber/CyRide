@@ -28,17 +28,18 @@ public class Utilities {
 		if (name.contains("2") && name.contains("East")) return 3;
 		if (name.contains("3") && name.contains("South")) return 4;
 		if (name.contains("3") && name.contains("North")) return 5;
-		if (name.contains("4") && name.contains("Gray")) return 6;
-		if (name.contains("5") && name.contains("Yellow")) return 7;
-		if (name.contains("6") && name.contains("Brown") && name.contains("North")) return 8;
-		if (name.contains("6A") && name.contains("Towers")) return 9;
-		if (name.contains("6B") || (name.contains("6") && name.contains("Brown") && name.contains("South"))) return 10;
-		if (name.contains("7") && name.contains("Purple")) return 11;
-		if (name.contains("10") && name.contains("Pink")) return 12;
-		if (name.contains("21") && name.contains("Cardinal")) return 13;
-		if (name.contains("22") && name.contains("Gold")) return 14;
-		if (name.contains("23") && name.contains("Orange")) return 15;
-		if (name.contains("24") && name.contains("Silver")) return 16;
+		if ((name.contains("4") && !name.contains("4A")) && name.contains("Gray")) return 6;
+		if (name.contains("4A") && name.contains("Gray")) return 7;
+		if (name.contains("5") && name.contains("Yellow")) return 8;
+		if (name.contains("6") && name.contains("Brown") && name.contains("North")) return 9;
+		if (name.contains("6A") && name.contains("Towers")) return 10;
+		if (name.contains("6B") || (name.contains("6") && name.contains("Brown") && name.contains("South"))) return 11;
+		if (name.contains("7") && name.contains("Purple")) return 12;
+		if (name.contains("10") && name.contains("Pink")) return 13;
+		if (name.contains("21") && name.contains("Cardinal")) return 14;
+		if (name.contains("22") && name.contains("Gold")) return 15;
+		if (name.contains("23") && name.contains("Orange")) return 16;
+		if (name.contains("24") && name.contains("Silver")) return 17;
 		
 		else return -1;
 	}

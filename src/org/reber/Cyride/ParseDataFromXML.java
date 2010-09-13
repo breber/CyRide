@@ -28,6 +28,8 @@ public class ParseDataFromXML extends HttpServlet{
 		String input = sb.toString();
 		
 		parseData(input);
+		
+		resp.sendRedirect("/updatecount");
 	}
 	
 	public static void parseData(String input) {
@@ -36,6 +38,10 @@ public class ParseDataFromXML extends HttpServlet{
 		
 		String route = input.substring(input.indexOf("<route>") + 7, input.indexOf("</route>"));
 		String dayOfWeek = input.substring(input.indexOf("<dayOfWeek>") + 11, input.indexOf("</dayOfWeek>"));
+		
+		if (route.endsWith("-")) {
+			route = route.substring(0, route.length() - 1);
+		}
 		
 		//Start after </stations>
 		String[] stationXml = input.substring(input.indexOf("</stations>")).split("</station>");
@@ -46,6 +52,7 @@ public class ParseDataFromXML extends HttpServlet{
 				continue;
 			}
 			String station = currentStation.substring(currentStation.indexOf("<name>") + 6, currentStation.indexOf("</name>"));
+			
 			int stationId = stationNumber;
 			
 			String[] rows = currentStation.split("</row>");

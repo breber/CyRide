@@ -52,6 +52,14 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 		<servlet-name>GetCount</servlet-name>
 		<url-pattern>/getcount</url-pattern>
 	</servlet-mapping>
+	<servlet>
+		<servlet-name>UpdateCount</servlet-name>
+		<servlet-class>org.reber.Cyride.UpdateCount</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>UpdateCount</servlet-name>
+		<url-pattern>/updatecount</url-pattern>
+	</servlet-mapping>
 	
 	<precompilation-enabled>true</precompilation-enabled>
 	

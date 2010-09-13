@@ -9,27 +9,42 @@
 <script type="text/javascript">
 
 $().ready(function() {
+	getCount();
+	
 	$("button#delete").click(function() {
-		$.get("/DeleteAll", function() {
-				alert("Deleted");
-			});
-		});
+		deleteAll();
+	});
 	$("button#getCount").click(function() {
-		$.get("/getcount", function(data) {
-				$("div#count").html(data);
-			});
-		});
+		getCount();
+	});
 });
+
+function getCount() {
+	$().ready(function() {
+		$.ajax({url:"/getcount", success:function(data) {
+			$("div#count").html(data);
+		}, error:function() { alert("Error"); }});
+	});
+}
+
+function deleteAll() {
+	$().ready(function() {
+		$("#loading").css("display", "inline");
+		$.ajax({url:"/DeleteAll", success:function(data) { $.get("/updatecount", function() { getCount();}); alert("Deleted All"); $("#loading").hide();}, 
+			error:function() { $("div#error").append("Error<br />"); $.get("/updatecount"); deleteAll(); }});
+	});
+}
 
 </script>
 </head>
 
 <body>
 <button id="getCount">Get Count</button>
-<div id="count" style="display:inline; margin-left:1em"></div>
+<div id="count" style="display: inline; margin-left: 1em"></div>
 
-<br /><br />
-<button id="delete">Delete</button>
-
+<br />
+<br />
+<button id="delete">Delete</button><div id="loading" style="display: none; margin-left: 1em"><img src='images/ajax-loader.gif' /></div>
+<div id="error"></div>
 </body>
 </html>
