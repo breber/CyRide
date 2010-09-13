@@ -7,13 +7,12 @@
     android:paddingTop="6dip"
     android:paddingBottom="6dip">
     <ImageView
-        android:id="@+id/icon"
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
         android:layout_marginRight="6dip"
         android:layout_marginLeft="0px"
         android:paddingLeft="0px"
-        android:src="@drawable/icon" />
+        android:id="@+id/icon" android:src="@drawable/clear"/>
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="0dip"
@@ -24,9 +23,6 @@
             android:layout_height="0dip"
             android:layout_weight="1" 
             android:id="@+id/label"
-            android:singleLine="true"
-            android:ellipsize="marquee"
-            android:gravity="center_vertical"
-        />
+            android:gravity="center_vertical" android:maxLines="2"/>
     </LinearLayout>
 </LinearLayout>
