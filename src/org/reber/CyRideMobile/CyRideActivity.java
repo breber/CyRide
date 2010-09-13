@@ -100,16 +100,16 @@ public class CyRideActivity extends Activity {
 					db.setDayOfWeek(arg2);
 				} 
 				if (status != ListViewStatus.TIMES_FOR_ROUTE) {
-					moveStatusForward();
-					if (status == ListViewStatus.ROUTE) {
+					boolean moved = moveStatusForward();
+					if (moved && status == ListViewStatus.ROUTE) {
 						selectedRoute = new NameIdWrapper("",-1);
 						selectedStation = new NameIdWrapper("",-1);
 						createList();
-					} else if (status == ListViewStatus.STATIONS) {
+					} else if (moved && status == ListViewStatus.STATIONS) {
 						selectedRoute = listIds.get(arg2);
 						selectedStation = new NameIdWrapper("",-1);
 						createList();
-					} else if (status == ListViewStatus.TIMES_FOR_STATION) {
+					} else if (moved && status == ListViewStatus.TIMES_FOR_STATION) {
 						selectedStation = listIds.get(arg2);
 						createList();
 					}
@@ -129,18 +129,24 @@ public class CyRideActivity extends Activity {
 	/**
 	 * Move the status of the ListView forward
 	 */
-	private void moveStatusForward() {
+	private boolean moveStatusForward() {
 		if (status == ListViewStatus.DATE) {
 			status = ListViewStatus.ROUTE;
+			return true;
 		} else if (status == ListViewStatus.ROUTE) {
 			status = ListViewStatus.STATIONS;
+			return true;
 		} else if (status == ListViewStatus.STATIONS) {
 			status = ListViewStatus.TIMES_FOR_STATION;
+			return true;
 		} else if (status == ListViewStatus.TIMES_FOR_STATION) {
-//			status = ListViewStatus.TIMES_FOR_ROUTE;
+			//			status = ListViewStatus.TIMES_FOR_ROUTE;
+			return false;
 		} else if (status == ListViewStatus.TIMES_FOR_ROUTE) {
 			status = ListViewStatus.TIMES_FOR_ROUTE;
+			return true;
 		}
+		return false;
 	}
 
 	/* (non-Javadoc)
@@ -180,7 +186,7 @@ public class CyRideActivity extends Activity {
 		} else if (day == 2){
 			return "Sunday";
 		}
-		
+
 		throw new IllegalArgumentException("day should be between 0-3");
 	}
 
@@ -345,23 +351,23 @@ public class CyRideActivity extends Activity {
 		String urlStr = "http://cyridesql.appspot.com/getroutes";
 
 		HttpClient httpclient = new DefaultHttpClient();
-        HttpGet httpget = new HttpGet(urlStr);
-        HttpResponse response;
-        
-        try {
-            response = httpclient.execute(httpget);
-            HttpEntity entity = response.getEntity();
-            
-            if (entity != null) {
-                InputStream instream = entity.getContent();
-                return convertStreamToString(instream);
-            }
-        } catch (IOException e) {		}
-        
-        //If we get here, that means there was an error
+		HttpGet httpget = new HttpGet(urlStr);
+		HttpResponse response;
+
+		try {
+			response = httpclient.execute(httpget);
+			HttpEntity entity = response.getEntity();
+
+			if (entity != null) {
+				InputStream instream = entity.getContent();
+				return convertStreamToString(instream);
+			}
+		} catch (IOException e) {		}
+
+		//If we get here, that means there was an error
 		return null;
 	}
-	
+
 	/**
 	 * Converts an InputStream to a String
 	 * 
@@ -371,25 +377,25 @@ public class CyRideActivity extends Activity {
 	 * The String contained in the InputStream
 	 */
 	private String convertStreamToString(InputStream is) {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        StringBuilder sb = new StringBuilder();
- 
-        String line = null;
-        try {
-            while ((line = reader.readLine()) != null) {
-                sb.append(line + "\n");
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                is.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return sb.toString();
-    }
+		BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+		StringBuilder sb = new StringBuilder();
+
+		String line = null;
+		try {
+			while ((line = reader.readLine()) != null) {
+				sb.append(line + "\n");
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				is.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return sb.toString();
+	}
 
 	/**
 	 * Adds the records from the JSON string to the database
@@ -404,10 +410,10 @@ public class CyRideActivity extends Activity {
 			routes.add(new Route(obj.getString("routename"), obj.getInt("routeid"), obj.getString("station"), obj.getInt("stationid"), 
 					obj.getString("timestring"), obj.getInt("time"), obj.getInt("dayofweek"), obj.getInt("rownum")));
 		}
-		
+
 		db.insertRoute(routes);
 	}
-	
+
 	/**
 	 * Exports the database to the SD card
 	 */
@@ -428,21 +434,13 @@ public class CyRideActivity extends Activity {
 			View v = convertView;
 			if (v == null) {
 				LayoutInflater vi = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-				if (status == ListViewStatus.TIMES_FOR_STATION || status == ListViewStatus.TIMES_FOR_ROUTE) {
-					v = vi.inflate(R.layout.timerow, null);
-				} else {
-					v = vi.inflate(R.layout.row, null);
-				}
+				v = vi.inflate(R.layout.row, null);
 			}
 			String text = items.get(position);
 			if (text != null) {
 				ImageView iv = (ImageView) v.findViewById(R.id.icon);
 				TextView tt  = null;
-				if (status == ListViewStatus.TIMES_FOR_STATION || status == ListViewStatus.TIMES_FOR_ROUTE) {
-					tt = (TextView) v.findViewById(R.id.labeltime);
-				} else {
-					tt = (TextView) v.findViewById(R.id.label);
-				}
+				tt = (TextView) v.findViewById(R.id.label);
 
 				if (tt != null) {
 					tt.setText(text);                            
@@ -491,7 +489,7 @@ public class CyRideActivity extends Activity {
 			return v;
 		}
 	}
-	
+
 	private class ImportDatabaseFileTask extends AsyncTask<String, Void, Boolean> {
 		private final ProgressDialog dialog = new ProgressDialog(CyRideActivity.this);
 
