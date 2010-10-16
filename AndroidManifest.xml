@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 	package="org.reber.CyRideMobile" android:versionCode="1"
 	android:versionName="1.0">
-	<application android:icon="@drawable/icon" android:label="@string/app_name"
-		android:debuggable="true">
+	<application android:label="@string/app_name"
+		android:debuggable="true" android:icon="@drawable/cyride">
 		<activity android:label="@string/app_name" android:name=".CyRideActivity">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
@@ -12,6 +12,6 @@
 		</activity>
 	</application>
 	<uses-permission android:name="android.permission.INTERNET"></uses-permission>
-
+	<uses-sdk android:minSdkVersion="7"/>
 
 </manifest> 
