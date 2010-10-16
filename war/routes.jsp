@@ -8,7 +8,7 @@
 <title>CyRide Routes</title>
 <link type="text/css" href="css/cyride.css" rel="stylesheet" />
 <script type="text/javascript"
-	src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+	src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"></script>
 <script type="text/javascript" src="js/cyride.js"></script>
 </head>
 
