@@ -348,7 +348,7 @@ public class CyRideActivity extends Activity {
 	 * Gets the string of data from the server
 	 */
 	private String getData() throws MalformedURLException, IOException {
-		String urlStr = "http://cyridesql.appspot.com/getroutes";
+		String urlStr = Utilities.DATA_URL;
 
 		HttpClient httpclient = new DefaultHttpClient();
 		HttpGet httpget = new HttpGet(urlStr);
@@ -501,15 +501,16 @@ public class CyRideActivity extends Activity {
 
 		// automatically done on worker thread (separate from UI thread)
 		protected Boolean doInBackground(final String... args) {
-			File dbFile = new File(Environment.getDataDirectory() + "/data/org.reber.CyRideMobile/databases/cyride.db");
+			File dbFile = new File(Environment.getDataDirectory() + "/data/" + Utilities.PACKAGE + "/databases/cyride.db");
 			InputStream db = CyRideActivity.this.getResources().openRawResource(R.raw.cyride);
 			OutputStream out;
 			try {
 				out = new FileOutputStream(dbFile);
-				byte buf[]=new byte[1024];
+				byte[] buf = new byte[1024];
 				int len;
-				while((len = db.read(buf)) > 0)
-					out.write(buf,0,len);
+				while ((len = db.read(buf)) > 0) {
+					out.write(buf, 0, len);
+				}
 				out.close();
 				db.close();
 			} catch (FileNotFoundException e1) {
@@ -545,14 +546,13 @@ public class CyRideActivity extends Activity {
 
 		// automatically done on worker thread (separate from UI thread)
 		protected Boolean doInBackground(final String... args) {
-
-			File dbFile =
-				new File(Environment.getDataDirectory() + "/data/org.reber.CyRideMobile/databases/cyride.db");
-
-			File exportDir = new File(Environment.getExternalStorageDirectory(), "cyride");
+			File dbFile = new File(Environment.getDataDirectory() + "/data/" + Utilities.PACKAGE + "/databases/cyride.db");
+			File exportDir = new File(Environment.getExternalStorageDirectory(), "Android/data/" + Utilities.PACKAGE);
+			
 			if (!exportDir.exists()) {
 				exportDir.mkdirs();
 			}
+			
 			File file = new File(exportDir, dbFile.getName());
 
 			try {
@@ -576,16 +576,18 @@ public class CyRideActivity extends Activity {
 			}
 		}
 
-		void copyFile(File src, File dst) throws IOException {
+		private void copyFile(File src, File dst) throws IOException {
 			FileChannel inChannel = new FileInputStream(src).getChannel();
 			FileChannel outChannel = new FileOutputStream(dst).getChannel();
 			try {
 				inChannel.transferTo(0, inChannel.size(), outChannel);
 			} finally {
-				if (inChannel != null)
+				if (inChannel != null) {
 					inChannel.close();
-				if (outChannel != null)
+				}
+				if (outChannel != null) {
 					outChannel.close();
+				}
 			}
 		}
 	}
