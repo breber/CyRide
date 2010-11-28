@@ -1,16 +1,10 @@
 package org.reber.CyRideMobile;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.MalformedURLException;
-import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -28,9 +22,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -45,7 +37,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 /**
  * The entry point for the CyRide Android app.
@@ -122,7 +113,7 @@ public class CyRideActivity extends Activity {
 			createList();
 		} else {
 			status = ListViewStatus.ROUTE;
-			new ImportDatabaseFileTask().execute();
+			new ImportDatabaseFileTask(this).execute();
 		}
 	}
 
@@ -190,11 +181,12 @@ public class CyRideActivity extends Activity {
 		throw new IllegalArgumentException("day should be between 0-3");
 	}
 
-	@SuppressWarnings("unchecked")
+	
 	/**
 	 * Creates the ListView based on the current status
 	 */
-	private void createList() {
+	@SuppressWarnings("unchecked")
+	void createList() {
 		list = new ArrayList<String>();
 		if (status == ListViewStatus.DATE) {
 			tv.setText(R.string.welcome);
@@ -418,7 +410,7 @@ public class CyRideActivity extends Activity {
 	 * Exports the database to the SD card
 	 */
 	private void exportDB() {
-		new ExportDatabaseFileTask().execute();
+		new ExportDatabaseFileTask(this).execute();
 	}
 
 	private class CyRideListAdapter extends ArrayAdapter<String> {
@@ -461,108 +453,6 @@ public class CyRideActivity extends Activity {
 				iv.setImageResource(Utilities.getImageResource(temp));
 			}
 			return v;
-		}
-	}
-
-	private class ImportDatabaseFileTask extends AsyncTask<String, Void, Boolean> {
-		private final ProgressDialog dialog = new ProgressDialog(CyRideActivity.this);
-
-		// can use UI thread here
-		protected void onPreExecute() {
-			this.dialog.setMessage("Loading database...");
-			this.dialog.show();
-		}
-
-		// automatically done on worker thread (separate from UI thread)
-		protected Boolean doInBackground(final String... args) {
-			File dbFile = new File(Environment.getDataDirectory() + "/data/" + Utilities.PACKAGE + "/databases/cyride.db");
-			InputStream db = CyRideActivity.this.getResources().openRawResource(R.raw.cyride);
-			OutputStream out;
-			try {
-				out = new FileOutputStream(dbFile);
-				byte[] buf = new byte[1024];
-				int len;
-				while ((len = db.read(buf)) > 0) {
-					out.write(buf, 0, len);
-				}
-				out.close();
-				db.close();
-			} catch (FileNotFoundException e1) {
-				e1.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-
-			return true;
-		}
-
-		// can use UI thread here
-		protected void onPostExecute(final Boolean success) {
-			if (this.dialog.isShowing()) {
-				this.dialog.dismiss();
-			}
-			if (success) {
-				createList();
-			} else {
-				Toast.makeText(CyRideActivity.this, "Transfer failed.", Toast.LENGTH_SHORT).show();
-			}
-		}
-	}
-
-	private class ExportDatabaseFileTask extends AsyncTask<String, Void, Boolean> {
-		private final ProgressDialog dialog = new ProgressDialog(CyRideActivity.this);
-
-		// can use UI thread here
-		protected void onPreExecute() {
-			this.dialog.setMessage("Exporting database...");
-			this.dialog.show();
-		}
-
-		// automatically done on worker thread (separate from UI thread)
-		protected Boolean doInBackground(final String... args) {
-			File dbFile = new File(Environment.getDataDirectory() + "/data/" + Utilities.PACKAGE + "/databases/cyride.db");
-			File exportDir = new File(Environment.getExternalStorageDirectory(), "Android/data/" + Utilities.PACKAGE);
-			
-			if (!exportDir.exists()) {
-				exportDir.mkdirs();
-			}
-			
-			File file = new File(exportDir, dbFile.getName());
-
-			try {
-				file.createNewFile();
-				this.copyFile(dbFile, file);
-				return true;
-			} catch (IOException e) {
-				return false;
-			}
-		}
-
-		// can use UI thread here
-		protected void onPostExecute(final Boolean success) {
-			if (this.dialog.isShowing()) {
-				this.dialog.dismiss();
-			}
-			if (success) {
-				Toast.makeText(CyRideActivity.this, "Export successful!", Toast.LENGTH_SHORT).show();
-			} else {
-				Toast.makeText(CyRideActivity.this, "Export failed", Toast.LENGTH_SHORT).show();
-			}
-		}
-
-		private void copyFile(File src, File dst) throws IOException {
-			FileChannel inChannel = new FileInputStream(src).getChannel();
-			FileChannel outChannel = new FileOutputStream(dst).getChannel();
-			try {
-				inChannel.transferTo(0, inChannel.size(), outChannel);
-			} finally {
-				if (inChannel != null) {
-					inChannel.close();
-				}
-				if (outChannel != null) {
-					outChannel.close();
-				}
-			}
 		}
 	}
 }

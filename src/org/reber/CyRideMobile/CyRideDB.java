@@ -16,8 +16,8 @@ import android.util.Log;
  * 
  * @author brianreber
  */
-public class CyRideDB 
-{
+public class CyRideDB {
+	
 	public static final String KEY_ROWID = "_id";
 	public static final String KEY_ROUTEID = "routeid";
 	public static final String KEY_ROUTENAME = "routename";
@@ -327,14 +327,13 @@ public class CyRideDB
 	 * 
 	 * @author brianreber
 	 */
-	private static class DatabaseHelper extends SQLiteOpenHelper 
-	{
+	private static class DatabaseHelper extends SQLiteOpenHelper {
 		/**
 		 * Creates a new Database with the given context
 		 * 
 		 * @param context
 		 */
-		DatabaseHelper(Context context) {
+		public DatabaseHelper(Context context) {
 			super(context, DATABASE_NAME, null, DATABASE_VERSION);
 		}
 

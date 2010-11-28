@@ -25,21 +25,22 @@ public class Utilities {
 	public static int getImageResource(String color) {
 		Map<String, Integer> colors = new HashMap<String, Integer>();
 		
-		colors.put("Red", (R.drawable.red));
-		colors.put("Blue", (R.drawable.blue));
-		colors.put("Green", (R.drawable.green));
-		colors.put("Brown", (R.drawable.brown));
-		colors.put("Yellow", (R.drawable.yellow));
-		colors.put("Orange", (R.drawable.orange));
-		colors.put("Pink", (R.drawable.pink));
-		colors.put("Purple", (R.drawable.purple));
-		colors.put("Towers", (R.drawable.darkerbrown));
-		colors.put("Silver", (R.drawable.silver));
-		colors.put("Gray", (R.drawable.gray));
-		colors.put("Cardinal", (R.drawable.cardinal));
-		colors.put("Gold", (R.drawable.gold));
+		colors.put("Red", R.drawable.red);
+		colors.put("Blue", R.drawable.blue);
+		colors.put("Green", R.drawable.green);
+		colors.put("Brown", R.drawable.brown);
+		colors.put("Towers", R.drawable.brown);
+		colors.put("Yellow", R.drawable.yellow);
+		colors.put("Orange", R.drawable.orange);
+		colors.put("Pink", R.drawable.pink);
+		colors.put("Purple", R.drawable.purple);
+		colors.put("Towers", R.drawable.darkerbrown);
+		colors.put("Silver", R.drawable.silver);
+		colors.put("Gray", R.drawable.gray);
+		colors.put("Cardinal", R.drawable.cardinal);
+		colors.put("Gold", R.drawable.gold);
 		
-		for (String s : color.split(" ")) {
+		for (String s : color.split("\\s|/")) {
 			if (colors.containsKey(s)) {
 				return colors.get(s);
 			}

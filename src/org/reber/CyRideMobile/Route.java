@@ -3,7 +3,6 @@ package org.reber.CyRideMobile;
 /**
  * An implementation of a Route that can be persisted into our databases.
  * 
- * 
  * @author brianreber
  */
 public class Route {
