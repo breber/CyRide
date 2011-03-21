@@ -26,6 +26,7 @@ import javax.jdo.annotations.PrimaryKey;
 @PersistenceCapable
 public class Route {
 
+	@SuppressWarnings("unused")
 	@PrimaryKey
 	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
 	private Long identifier;
@@ -70,13 +71,6 @@ public class Route {
 	
 	public void setStationId(int temp) {
 		this.stationId = temp;
-	}
-
-	/**
-	 * @return the identifier
-	 */
-	public Long getIdentifier() {
-		return identifier;
 	}
 
 	/**
