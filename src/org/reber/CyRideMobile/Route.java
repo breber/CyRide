@@ -14,12 +14,15 @@
  */
 package org.reber.CyRideMobile;
 
+
 /**
- * An implementation of a Route that can be persisted into our databases.
- * 
  * @author brianreber
+ *
  */
 public class Route {
+
+	@SuppressWarnings("unused")
+	private Long identifier;
 
 	private String routeName;
 	private int routeId;
@@ -29,18 +32,12 @@ public class Route {
 	private int time;
 	private int day;
 	private int rowNum;
-
+	
 	/**
-	 * Creates a Route with the given parameters.
-	 * 
 	 * @param routeName
 	 * @param routeId
 	 * @param station
-	 * @param stationId
-	 * @param timeString
 	 * @param time
-	 * @param day
-	 * @param rowNum
 	 */
 	public Route(String routeName, int routeId, String station, int stationId, String timeString, int time, int day, int rowNum) {
 		this.routeName = routeName;
@@ -51,6 +48,14 @@ public class Route {
 		this.time = time;
 		this.day = day;
 		this.rowNum = rowNum;
+	}
+	
+	public String getStation() {
+		return station;	
+	}
+	
+	public void setStationId(int temp) {
+		this.stationId = temp;
 	}
 
 	/**
@@ -65,13 +70,6 @@ public class Route {
 	 */
 	public int getRouteId() {
 		return routeId;
-	}
-
-	/**
-	 * @return the station
-	 */
-	public String getStation() {
-		return station;
 	}
 
 	/**

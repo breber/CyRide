@@ -32,14 +32,14 @@ import android.util.Log;
 public class CyRideDB {
 	
 	public static final String KEY_ROWID = "_id";
-	public static final String KEY_ROUTEID = "routeid";
-	public static final String KEY_ROUTENAME = "routename";
-	public static final String KEY_STATIONNAME = "stationname";
-	public static final String KEY_STATIONID = "stationid";
-	public static final String KEY_TIMESTRING = "timestring";
+	public static final String KEY_ROUTEID = "routeId";
+	public static final String KEY_ROUTENAME = "routeName";
+	public static final String KEY_STATIONNAME = "stationName";
+	public static final String KEY_STATIONID = "stationId";
+	public static final String KEY_TIMESTRING = "timeString";
 	public static final String KEY_TIME = "time";
 	public static final String KEY_DAY = "day";
-	public static final String KEY_ROWNUM = "rownum";
+	public static final String KEY_ROWNUM = "rowNum";
 	private static final String TAG = "CyRideDB";
 
 	private static final String DATABASE_NAME = "cyride.db";
@@ -147,7 +147,6 @@ public class CyRideDB {
 		try{
 			db.beginTransaction();
 			for (Route r : routes) {
-
 				ContentValues initialValues = new ContentValues();
 				initialValues.put(KEY_ROUTEID, r.getRouteId());
 				initialValues.put(KEY_ROUTENAME, r.getRouteName());

@@ -49,9 +49,10 @@ public class ExportDatabaseFileTask extends AsyncTask<String, Void, Boolean> {
 
 	// automatically done on worker thread (separate from UI thread)
 	protected Boolean doInBackground(final String... args) {
+		
 		File dbFile = new File(Environment.getDataDirectory() + "/data/" + Utilities.PACKAGE + "/databases/cyride.db");
 		File exportDir = new File(Environment.getExternalStorageDirectory(), "Android/data/" + Utilities.PACKAGE);
-		
+
 		if (!exportDir.exists()) {
 			exportDir.mkdirs();
 		}

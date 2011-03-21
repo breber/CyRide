@@ -38,6 +38,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -324,7 +325,10 @@ public class CyRideActivity extends Activity {
 				try {
 					db.deleteAllRoutes();
 					json = new JSONObject(getData());
+					Log.d("CYRIDE", "Created JSONObject from received data");
+					Log.d("CYRIDE", "Adding records to database");
 					addRecords();
+					Log.d("CYRIDE", "Done adding records to database");
 					json = null;
 					handler.post(new Runnable() {
 						@Override
@@ -361,10 +365,13 @@ public class CyRideActivity extends Activity {
 		HttpResponse response;
 
 		try {
+			Log.d("CYRIDE", "Sending request");
 			response = httpclient.execute(httpget);
+			Log.d("CYRIDE", "Getting entity");
 			HttpEntity entity = response.getEntity();
 
 			if (entity != null) {
+				Log.d("CYRIDE", "Getting entity content");
 				InputStream instream = entity.getContent();
 				return convertStreamToString(instream);
 			}
@@ -383,13 +390,15 @@ public class CyRideActivity extends Activity {
 	 * The String contained in the InputStream
 	 */
 	private String convertStreamToString(InputStream is) {
+		Log.d("CYRIDE", "Creating buffered reader");
 		BufferedReader reader = new BufferedReader(new InputStreamReader(is));
 		StringBuilder sb = new StringBuilder();
 
-		String line = null;
+		String line;
 		try {
 			while ((line = reader.readLine()) != null) {
-				sb.append(line + "\n");
+				sb.append(line);
+				Log.d("CYRIDE", "Read line");
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -400,6 +409,7 @@ public class CyRideActivity extends Activity {
 				e.printStackTrace();
 			}
 		}
+		Log.d("CYRIDE", "Finished getting string");
 		return sb.toString();
 	}
 
@@ -413,8 +423,8 @@ public class CyRideActivity extends Activity {
 		List<Route> routes = new ArrayList<Route>();
 		for (int i = 0; i < array.length(); i++) {
 			JSONObject obj = array.getJSONObject(i);
-			routes.add(new Route(obj.getString("routename"), obj.getInt("routeid"), obj.getString("station"), obj.getInt("stationid"), 
-					obj.getString("timestring"), obj.getInt("time"), obj.getInt("dayofweek"), obj.getInt("rownum")));
+			routes.add(new Route(obj.getString("routeName"), obj.getInt("routeId"), obj.getString("station"), obj.getInt("stationId"), 
+					obj.getString("timeString"), obj.getInt("time"), obj.getInt("day"), obj.getInt("rowNum")));
 		}
 
 		db.insertRoute(routes);
