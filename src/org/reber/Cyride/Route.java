@@ -23,7 +23,6 @@ import javax.jdo.annotations.PrimaryKey;
  * @author brianreber
  *
  */
-@SuppressWarnings("unused")
 @PersistenceCapable
 public class Route {
 
@@ -73,7 +72,59 @@ public class Route {
 		this.stationId = temp;
 	}
 
-	public String toString() {
-		return "{\"routeid\":"+routeId+",\"routename\":\""+routeName+"\",\"station\":\""+station+"\",\"stationid\":"+stationId+",\"timestring\":\""+timeString+"\",\"time\":"+time+",\"dayofweek\":"+day+",\"rownum\":"+rowNum+"}";
+	/**
+	 * @return the identifier
+	 */
+	public Long getIdentifier() {
+		return identifier;
+	}
+
+	/**
+	 * @return the routeName
+	 */
+	public String getRouteName() {
+		return routeName;
+	}
+
+	/**
+	 * @return the routeId
+	 */
+	public int getRouteId() {
+		return routeId;
+	}
+
+	/**
+	 * @return the stationId
+	 */
+	public int getStationId() {
+		return stationId;
+	}
+
+	/**
+	 * @return the timeString
+	 */
+	public String getTimeString() {
+		return timeString;
+	}
+
+	/**
+	 * @return the time
+	 */
+	public int getTime() {
+		return time;
+	}
+
+	/**
+	 * @return the day
+	 */
+	public int getDay() {
+		return day;
+	}
+
+	/**
+	 * @return the rowNum
+	 */
+	public int getRowNum() {
+		return rowNum;
 	}
 }
